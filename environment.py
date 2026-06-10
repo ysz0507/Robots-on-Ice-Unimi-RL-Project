@@ -76,6 +76,11 @@ class IceEnv:
 
         self.step_count = 0
         self.done = False
+        tile = pygame.image.load("assets/ice_3_tile.png").convert()
+        self.background = pygame.Surface((Settings.WIDTH, Settings.HEIGHT))
+        for x in range(0, Settings.WIDTH, tile.get_width()):
+            for y in range(0, Settings.HEIGHT, tile.get_height()):
+                self.background.blit(tile, (x, y))
 
     def reset(self):
         self.robot.reset(Settings.WIDTH // 2, Settings.HEIGHT // 2)
@@ -145,7 +150,7 @@ class IceEnv:
         return next_state, reward, self.done
 
     def draw(self, screen):
-        screen.fill(Settings.WHITE)
+        screen.blit(self.background, (0, 0))
 
         self.target.draw(screen)
         self.robot.draw(screen)

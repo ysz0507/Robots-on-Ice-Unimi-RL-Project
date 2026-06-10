@@ -1,6 +1,7 @@
 # Project 7: Robots on Ice (Project ID: PG-1)
 
 ## Main Focus
+
 - Continuous control
 - Policy gradient methods
 
@@ -8,20 +9,24 @@
 
 ## Scientific Objective
 
-The project investigates the challenges related to the control of continuous-space dynamical systems, in particular continuous actions.
+The project investigates the challenges related to the control of continuous-space dynamical systems, in particular
+continuous actions.
 
 ---
 
 ## Problem Description
 
-A robot Zamboni (ice resurfacer) is given a sequence of targets on an ice skating rink. It has to reach each given target within 20 seconds.
+A robot Zamboni (ice resurfacer) is given a sequence of targets on an ice skating rink. It has to reach each given
+target within 20 seconds.
 
 The robot:
+
 - Is holonomic (can move in any direction)
 - Has a control frequency of 10 decisions per second
 - Operates on an almost frictionless ice surface
 
 Let:
+
 - `m` be the mass of the robot
 - `x(t)` be the position (in meters) of the robot in the xy-plane at time `t`
 - `v(t)` be the velocity of the robot
@@ -66,21 +71,21 @@ The constant `C`:
 
 1. Model the problem as an MDP:
 
-   * Define continuous states
-   * Define continuous actions
-   * Define rewards
+    * Define continuous states
+    * Define continuous actions
+    * Define rewards
 
 2. Model the robot’s control policy using a parametric policy of choice.
 
 3. Implement the agent using a policy gradient method of choice:
 
-   * Find good hyperparameters
-   * Train the agent
+    * Find good hyperparameters
+    * Train the agent
 
 4. Compare:
 
-   * Final average return
-   * Learning curves
+    * Final average return
+    * Learning curves
 
 for:
 
@@ -123,3 +128,9 @@ where the friction coefficient `b` is between:
 ```text
 10^-2 and 10^-1
 ```
+
+# Assets
+
+Thank you for providing the assets for free use.
+
+- [Ice Tiles by upklyak](https://www.magnific.com/free-vector/crack-ice-game-seamless-texture-frozen-gui-asset_37947493.htm#fromView=search&page=1&position=0&uuid=a1bedb87-b91f-4494-9935-f1db850c4f7f&query=Ice+cartoons+tile)
