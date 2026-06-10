@@ -11,6 +11,7 @@ class Settings:
 
     ROBOT_WIDTH = 80
     TARGET_WIDTH = 60
+    COLLECT_DISTANCE = 60
 
     MAX_FORCE = 1000.0  # Newtons
     ROBOT_MASS = 2.0  # kg

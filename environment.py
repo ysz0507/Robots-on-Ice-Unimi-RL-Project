@@ -135,7 +135,7 @@ class IceEnv:
             self.robot.pos - self.target.pos
         )
 
-        return distance < 25
+        return distance < Settings.COLLECT_DISTANCE
 
     def step(self, action):
         """
