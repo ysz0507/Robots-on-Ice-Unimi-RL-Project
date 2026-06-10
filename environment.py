@@ -88,7 +88,7 @@ class IceEnv:
 
         self.step_count = 0
         self.done = False
-        tile = pygame.image.load("assets/ice_3_tile.png").convert()
+        tile = pygame.image.load("assets/moon_tile.png").convert()
         self.background = pygame.Surface((Settings.WIDTH, Settings.HEIGHT))
         for x in range(0, Settings.WIDTH, tile.get_width()):
             for y in range(0, Settings.HEIGHT, tile.get_height()):

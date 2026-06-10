@@ -133,6 +133,6 @@ where the friction coefficient `b` is between:
 
 Thank you to the artists for providing the assets under a free use license!
 
-- [Ice Tiles by upklyak](https://www.magnific.com/free-vector/crack-ice-game-seamless-texture-frozen-gui-asset_37947493.htm)
+- [Moon Tiles by upklyak](https://www.magnific.com/free-vector/moon-surface-seamless-background-with-craters_24025286.htm)
 - [Robot by jcomp](https://www.magnific.com/free-vector/set-ufo-game-vehicle-cartoon-style-illustration_13330355.htm)
 - [Stars by juicy_fish](https://www.magnific.com/free-vector/stars_34295176.htm)

@@ -9,8 +9,8 @@ class Settings:
     FPS = 30  # 10 for the assignment
     DT = 1.0 / FPS  # physics timestep
 
-    ROBOT_WIDTH = 80
-    TARGET_WIDTH = 60
+    ROBOT_WIDTH = 100
+    TARGET_WIDTH = 80
     COLLECT_DISTANCE = 60
 
     MAX_FORCE = 1000.0  # Newtons
