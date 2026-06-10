@@ -43,6 +43,7 @@ class RLAgent(Agent):
     def train(self, transitions: list[Transition]):
         """
         TODO: Replace with training logic.
+        Note: the transitions are not scaled.
         """
         pass
 

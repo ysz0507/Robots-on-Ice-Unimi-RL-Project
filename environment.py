@@ -114,9 +114,8 @@ class IceEnv:
         """
 
         return np.concatenate([
-            self.robot.pos,
+            self.target.pos - self.robot.pos,
             self.robot.vel,
-            self.target.pos
         ])
 
     def compute_reward(self, force):
