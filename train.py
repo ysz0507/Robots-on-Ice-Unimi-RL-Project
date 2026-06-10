@@ -1,0 +1,32 @@
+import tqdm
+
+from agents import Agent, Transition, RLAgent
+from buffer import ReplayBuffer
+from environment import IceEnv
+from settings import TrainingSettings
+
+
+def main():
+    env = IceEnv()
+    agent: Agent = RLAgent()
+    buffer = ReplayBuffer(TrainingSettings.BUFFER_SIZE)
+
+    state = env.reset()
+
+    for _ in tqdm.tqdm(range(TrainingSettings.EPISODES)):
+
+        # Collect one trajectory
+        done = False
+        while not done:
+            action = agent.select_action(state)
+            next_state, reward, done = env.step(action)
+            buffer.store(Transition(state, action, reward, next_state, done))
+            state = next_state
+
+        state = env.reset()
+
+        agent.train(buffer.sample(TrainingSettings.BATCH_SIZE))
+
+
+if __name__ == "__main__":
+    main()

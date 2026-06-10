@@ -1,7 +1,15 @@
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
-class Settings:
+class TrainingSettings:
+    EPISODES = 1000
+    BATCH_SIZE = 20
+    ENERGY_COEFF = 0.1
+    BUFFER_SIZE = 1000
+
+@dataclass(frozen=True)
+class RenderingSettings:
     ICE_FRICTION = 0.02  # Between 0.1 and 0.01 for the assignment
     WIDTH = 1500
     HEIGHT = 1000
@@ -15,7 +23,6 @@ class Settings:
 
     MAX_FORCE = 40e3  # Newtons
     ROBOT_MASS = 75  # kg
-    ENERGY_COEFF = 0.1
 
     EPISODE_TIME = 20  # seconds
     MAX_STEPS = int(EPISODE_TIME * FPS)
