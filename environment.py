@@ -20,12 +20,6 @@ class StationaryEntity:
         )
 
     def draw(self, screen):
-        pygame.draw.circle(
-            screen,
-            Settings.RED,
-            self.pos.astype(int),
-            Settings.TARGET_WIDTH / 2
-        )
         screen.blit(self.background, self.pos - self.background.get_rect().center)
 
     def reset(self, x, y):
