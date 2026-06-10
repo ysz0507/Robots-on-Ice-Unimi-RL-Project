@@ -54,6 +54,7 @@ class Robot(StationaryEntity):
 
         # Velocity update
         self.vel += Settings.DT * (force / self.mass)
+        self.vel -= Settings.ICE_FRICTION * self.vel
 
 
 class Target(StationaryEntity):
