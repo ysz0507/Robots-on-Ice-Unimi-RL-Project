@@ -13,8 +13,8 @@ class Settings:
     TARGET_WIDTH = 80
     COLLECT_DISTANCE = 60
 
-    MAX_FORCE = 1000.0  # Newtons
-    ROBOT_MASS = 2.0  # kg
+    MAX_FORCE = 40e3  # Newtons
+    ROBOT_MASS = 75  # kg
     ENERGY_COEFF = 0.1
 
     EPISODE_TIME = 20  # seconds
