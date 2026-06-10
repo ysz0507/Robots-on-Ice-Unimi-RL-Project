@@ -1,3 +1,6 @@
+import random
+
+import numpy as np
 import tqdm
 
 from agents import Agent, Transition, RLAgent
@@ -7,6 +10,9 @@ from settings import TrainingSettings
 
 
 def main():
+    random.seed(TrainingSettings.SEED)
+    np.random.seed(TrainingSettings.SEED)
+
     env = IceEnv()
     agent: Agent = RLAgent()
     buffer = ReplayBuffer(TrainingSettings.BUFFER_SIZE)

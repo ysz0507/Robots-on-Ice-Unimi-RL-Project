@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class TrainingSettings:
+    SEED = 47
     EPISODES = 1000
     BATCH_SIZE = 20
     ENERGY_COEFF = 0.1
