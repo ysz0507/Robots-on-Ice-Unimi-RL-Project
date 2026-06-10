@@ -3,6 +3,7 @@ import pygame
 
 from settings import Settings
 
+
 class TrainedAgent:
     def __init__(self):
         pass
@@ -44,5 +45,10 @@ class HumanAgent:
         for key, action in self.key_mapping.items():
             if keys[key]:
                 force += action
+
+        # Clamp force magnitude
+        norm = np.linalg.norm(force)
+        if norm > Settings.MAX_FORCE:
+            force = force / norm * Settings.MAX_FORCE
 
         return force

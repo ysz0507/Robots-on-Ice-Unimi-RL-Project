@@ -6,15 +6,40 @@ import pygame
 from settings import Settings
 
 
-class Robot:
-    def __init__(self, x, y, mass):
-        self.mass = mass
-
+class StationaryEntity:
+    def __init__(self, x, y, image_path, width):
         self.pos = np.array([x, y], dtype=np.float32)
-        self.vel = np.array([0.0, 0.0], dtype=np.float32)
+        self.background = self._load_image(image_path, width)
+
+    @staticmethod
+    def _load_image(path, width):
+        image = pygame.image.load(path).convert_alpha()
+        return pygame.transform.smoothscale_by(
+            image,
+            width / image.get_width()
+        )
+
+    def draw(self, screen):
+        pygame.draw.circle(
+            screen,
+            Settings.RED,
+            self.pos.astype(int),
+            Settings.TARGET_WIDTH / 2
+        )
+        screen.blit(self.background, self.pos - self.background.get_rect().center)
 
     def reset(self, x, y):
         self.pos[:] = [x, y]
+
+
+class Robot(StationaryEntity):
+    def __init__(self, x, y, mass):
+        super().__init__(x, y, "assets/robot.png", Settings.ROBOT_WIDTH)
+        self.mass = mass
+        self.vel = np.array([0.0, 0.0], dtype=np.float32)
+
+    def reset(self, x, y):
+        super().reset(x, y)
         self.vel[:] = [0.0, 0.0]
 
     def update(self, force):
@@ -36,20 +61,19 @@ class Robot:
         # Velocity update
         self.vel += Settings.DT * (force / self.mass)
 
-    def draw(self, screen):
-        pygame.draw.circle(
-            screen,
-            Settings.BLUE,
-            self.pos.astype(int),
-            Settings.ROBOT_RADIUS
-        )
 
-
-class Target:
+class Target(StationaryEntity):
     def __init__(self):
-        self.pos = self.random_position()
+        pos = self.__random_position()
+        super().__init__(pos[0], pos[1], self.__random_star_path(), Settings.TARGET_WIDTH)
 
-    def random_position(self):
+    @staticmethod
+    def __random_star_path():
+        index = random.randint(1, 4)
+        return f"assets/star_{index}.png"
+
+    @staticmethod
+    def __random_position():
         margin = 50
 
         x = random.randint(margin, Settings.WIDTH - margin)
@@ -58,15 +82,8 @@ class Target:
         return np.array([x, y], dtype=np.float32)
 
     def respawn(self):
-        self.pos = self.random_position()
-
-    def draw(self, screen):
-        pygame.draw.circle(
-            screen,
-            Settings.RED,
-            self.pos.astype(int),
-            Settings.TARGET_RADIUS
-        )
+        self.background = self._load_image(self.__random_star_path(), Settings.TARGET_WIDTH)
+        self.pos = self.__random_position()
 
 
 class IceEnv:
