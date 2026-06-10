@@ -1,10 +1,18 @@
+import abc
+
 import numpy as np
 import pygame
 
 from settings import Settings
 
 
-class TrainedAgent:
+class Agent(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def select_action(self, state):
+        pass
+
+
+class TrainedAgent(Agent):
     def __init__(self):
         pass
 
@@ -21,12 +29,6 @@ class TrainedAgent:
         )
 
         return force
-
-    def train(self):
-        """
-        Placeholder for policy gradient update.
-        """
-        pass
 
 class HumanAgent:
     def __init__(self):
