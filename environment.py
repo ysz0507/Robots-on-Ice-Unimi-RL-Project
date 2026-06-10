@@ -91,7 +91,7 @@ class IceEnv:
 
         self.step_count = 0
         self.done = False
-        
+
         if pygame.get_init():
             tile = pygame.image.load("assets/moon_tile.png").convert()
             self.background = pygame.Surface((RenderingSettings.WIDTH, RenderingSettings.HEIGHT))
@@ -120,20 +120,17 @@ class IceEnv:
         ])
 
     def compute_reward(self, force):
-        """
-        Reward = negative distance penalty
-                 - energy penalty
-        """
+        def compute_distance_penalty():
+            distance = np.linalg.norm(
+                self.robot.pos - self.target.pos
+            )
+            return -distance ** 2
 
-        distance = np.linalg.norm(
-            self.robot.pos - self.target.pos
-        )
+        def compute_energy_penalty():
+            energy = np.linalg.norm(force)
+            return -TrainingSettings.ENERGY_COEFF * energy ** 2
 
-        energy = (TrainingSettings.ENERGY_COEFF / 100.0) * np.linalg.norm(force) ** 2
-
-        reward = -(distance ** 2) - energy
-
-        return reward
+        return compute_distance_penalty() + compute_energy_penalty()
 
     def check_target_reached(self):
         distance = np.linalg.norm(
