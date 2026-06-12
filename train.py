@@ -3,7 +3,9 @@ import random
 import numpy as np
 import tqdm
 
-from agents import Agent, Transition, RLAgent
+from agents.advantage_actor_critic import AdvantageActorCriticAgent
+from agents.agent import Agent, Transition
+from agents.scaling_wrapper import ScalingWrapper
 from buffer import ReplayBuffer
 from environment import IceEnv
 from settings import TrainingSettings
@@ -14,7 +16,7 @@ def main():
     np.random.seed(TrainingSettings.SEED)
 
     env = IceEnv()
-    agent: Agent = RLAgent()
+    agent: Agent = ScalingWrapper(AdvantageActorCriticAgent())
     buffer = ReplayBuffer(TrainingSettings.BUFFER_SIZE)
 
     state = env.reset()

@@ -9,6 +9,11 @@ class TrainingSettings:
     ENERGY_COEFF = 0.1
     BUFFER_SIZE = 1000
 
+    DISCOUNT_FACTOR = 0.9
+    ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
+    CRITIC_LEARNING_RATE = 2e-3
+
+
 @dataclass(frozen=True)
 class RenderingSettings:
     ICE_FRICTION = 0.02  # Between 0.1 and 0.01 for the assignment

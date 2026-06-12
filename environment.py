@@ -3,7 +3,7 @@ import random
 import numpy as np
 import pygame
 
-from agents import HumanAgent
+from agents.human_agent import HumanAgent
 from settings import RenderingSettings, TrainingSettings
 
 

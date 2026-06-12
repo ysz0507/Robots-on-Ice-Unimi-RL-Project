@@ -1,51 +1,8 @@
-import abc
-from dataclasses import dataclass
-
 import numpy as np
 import pygame
 
+from agents.agent import Agent, Transition
 from settings import RenderingSettings
-
-
-@dataclass(frozen=True)
-class Transition:
-    state: np.ndarray
-    action: np.ndarray
-    reward: float
-    next_state: np.ndarray
-    done: bool
-
-class Agent(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def select_action(self, state):
-        pass
-
-    @abc.abstractmethod
-    def train(self, transitions: list[Transition]):
-        pass
-
-
-class RLAgent(Agent):
-    def select_action(self, state):
-        """
-        Replace with policy network output.
-        """
-
-        # Random continuous action
-        force = np.random.uniform(
-            low=-RenderingSettings.MAX_FORCE,
-            high=RenderingSettings.MAX_FORCE,
-            size=(2,)
-        )
-
-        return force
-
-    def train(self, transitions: list[Transition]):
-        """
-        TODO: Replace with training logic.
-        Note: the transitions are not scaled.
-        """
-        pass
 
 
 class HumanAgent(Agent):

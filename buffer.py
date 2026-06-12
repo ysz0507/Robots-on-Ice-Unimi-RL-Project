@@ -1,6 +1,6 @@
 import random
 
-from agents import Transition
+from agents.agent import Transition
 
 
 class ReplayBuffer:
