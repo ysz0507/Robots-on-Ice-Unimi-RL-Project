@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import imageio
 import numpy as np
@@ -108,7 +109,7 @@ class RecordedIceEnv(IceEnv):
         self.frames.append(pygame.surfarray.array3d(screen))
 
     def save_recording(self):
-        aligned_axis = np.transpose(self.frames, (0, 2, 1, 3))
+        aligned_axis: Any = np.transpose(self.frames, (0, 2, 1, 3))
         imageio.mimsave(self.record_path, aligned_axis, fps=RenderingSettings.FPS)
         print(f"Recording saved to {self.record_path}")
 
