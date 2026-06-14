@@ -98,20 +98,22 @@ class IceEnv:
 
 
 class RecordedIceEnv(IceEnv):
-    def __init__(self, record_path):
+    def __init__(self, recording_dir: str):
         super().__init__()
-        Path(record_path).parent.mkdir(parents=True, exist_ok=True)
-        self.record_path = record_path
+        self.recording_dir = Path(recording_dir)
+        self.recording_dir.mkdir(parents=True, exist_ok=True)
         self.frames = []
 
     def draw(self, screen):
         super().draw(screen)
         self.frames.append(pygame.surfarray.array3d(screen))
 
-    def save_recording(self):
+    def save_recording(self) -> Path:
         aligned_axis: Any = np.transpose(self.frames, (0, 2, 1, 3))
-        imageio.mimsave(self.record_path, aligned_axis, fps=RenderingSettings.FPS)
-        print(f"Recording saved to {self.record_path}")
+        video_path = self.recording_dir / (datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".mp4")
+        imageio.mimsave(video_path, aligned_axis, fps=RenderingSettings.FPS)
+        print(f"Recording saved to {video_path}")
+        return video_path
 
 def main():
     pygame.init()
@@ -121,7 +123,7 @@ def main():
 
     clock = pygame.time.Clock()
 
-    env = RecordedIceEnv(f"/tmp/robots_on_ice/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.mp4")
+    env = RecordedIceEnv(f"/tmp/robots_on_ice/")
     agent = HumanAgent()
 
     state = env.reset()
