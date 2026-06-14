@@ -12,6 +12,8 @@ class Settings(metaclass=ABCMeta):
 class TrainingSettings(Settings):
     SEED = 47
     LOG_FREQ = 100
+    VIDEO_FREQ = 200
+
     EPISODES = 1000
     BATCH_SIZE = 20
     ENERGY_COEFF = 0.1
@@ -25,8 +27,8 @@ class TrainingSettings(Settings):
 @dataclass(frozen=True)
 class RenderingSettings(Settings):
     ICE_FRICTION = 0.02  # Between 0.1 and 0.01 for the assignment
-    WIDTH = 1500
-    HEIGHT = 1000
+    WIDTH = 1504  # Use multiples of 16 for better rendering
+    HEIGHT = 1008
 
     FPS = 30  # 10 for the assignment
     DT = 1.0 / FPS  # physics timestep

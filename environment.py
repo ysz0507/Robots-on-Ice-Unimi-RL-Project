@@ -1,5 +1,7 @@
-import random
+from datetime import datetime
+from pathlib import Path
 
+import imageio
 import numpy as np
 import pygame
 
@@ -94,6 +96,22 @@ class IceEnv:
         self.robot.draw(screen)
 
 
+class RecordedIceEnv(IceEnv):
+    def __init__(self, record_path):
+        super().__init__()
+        Path(record_path).parent.mkdir(parents=True, exist_ok=True)
+        self.record_path = record_path
+        self.frames = []
+
+    def draw(self, screen):
+        super().draw(screen)
+        self.frames.append(pygame.surfarray.array3d(screen))
+
+    def save_recording(self):
+        aligned_axis = np.transpose(self.frames, (0, 2, 1, 3))
+        imageio.mimsave(self.record_path, aligned_axis, fps=RenderingSettings.FPS)
+        print(f"Recording saved to {self.record_path}")
+
 def main():
     pygame.init()
 
@@ -102,7 +120,7 @@ def main():
 
     clock = pygame.time.Clock()
 
-    env = IceEnv()
+    env = RecordedIceEnv(f"/tmp/robots_on_ice/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.mp4")
     agent = HumanAgent()
 
     state = env.reset()
@@ -126,6 +144,7 @@ def main():
         clock.tick(RenderingSettings.FPS)
 
     pygame.quit()
+    env.save_recording()
 
 
 if __name__ == "__main__":
