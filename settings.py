@@ -12,16 +12,14 @@ class Settings(metaclass=ABCMeta):
 class TrainingSettings(Settings):
     SEED = 47
     LOG_FREQ = 100
-    VIDEO_FREQ = 1000
+    VIDEO_FREQ = 2000
 
-    EPISODES = 10000
-    BATCH_SIZE = 20
+    EPISODES = 100000
     ENERGY_COEFF = 0.1
-    BUFFER_SIZE = 1000
 
-    DISCOUNT_FACTOR = 0.9
+    DISCOUNT_FACTOR = 0.99
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
-    CRITIC_LEARNING_RATE = 2e-3
+    CRITIC_LEARNING_RATE = 1.5e-3
 
 
 @dataclass(frozen=True)

@@ -18,7 +18,7 @@ class PolicyNetwork(nn.Module):
         self.mean = nn.Linear(128, action_dim)
 
         # Learnable log standard deviation
-        self.log_std = nn.Parameter(torch.zeros(action_dim))
+        self.log_std = nn.Parameter(torch.ones(action_dim))
 
     def forward(self, x):
         x = relu(self.fc1(x))
@@ -75,34 +75,27 @@ class AdvantageActorCriticAgent(Agent):
         return action.detach().numpy()
 
     def train(self, transitions: list[Transition]) -> tuple[float, float]:
-        total_actor_loss = 0.0
-        total_critic_loss = 0.0
-        for t in transitions:
-            actor_loss, critic_loss = self.__train_single_transition(
-                state=torch.tensor(t.state),
-                action=torch.tensor(t.action),
-                reward=t.reward,
-                next_state=torch.tensor(t.next_state),
-                done=t.done
-            )
-            total_actor_loss += actor_loss
-            total_critic_loss += critic_loss
+        return self.__train_batch(
+            states=torch.stack([torch.tensor(t.state, dtype=torch.float32) for t in transitions]),
+            actions=torch.stack([torch.tensor(t.action, dtype=torch.float32) for t in transitions]),
+            rewards=torch.tensor([t.reward for t in transitions], dtype=torch.float32),
+            next_states=torch.stack([torch.tensor(t.next_state, dtype=torch.float32) for t in transitions]),
+            dones=torch.tensor([t.done for t in transitions], dtype=torch.float32),
+        )
 
-        return total_actor_loss / len(transitions), total_critic_loss / len(transitions)
-
-    def __train_single_transition(self, state, action, reward, next_state, done):
-        value = self.critic(state)
+    def __train_batch(self, states, actions, rewards, next_states, dones):
+        value = self.critic(states)
         with torch.no_grad():
-            next_value = self.critic(next_state)
+            next_value = self.critic(next_states)
 
-        advantage = reward + (1 - done) * self.gamma * next_value - value
+        advantage = rewards + (1 - dones) * self.gamma * next_value - value
 
         # Update actor
-        mean, std = self.actor(state)
+        mean, std = self.actor(states)
         dist = Normal(mean, std)
         # Omitting 1/(1-gamma) factor since it doesn't affect the optimization
-        log_prob = dist.log_prob(action).sum()  # TODO Verify that this is correct for multi-dimensional actions
-        actor_loss = -(log_prob * advantage.detach())
+        log_prob = dist.log_prob(actions).sum(-1)
+        actor_loss = -(log_prob * advantage.detach()).mean()
 
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
@@ -110,7 +103,7 @@ class AdvantageActorCriticAgent(Agent):
 
         # Update critic
         # Equivalent to w←w+βδ∇V(St)
-        critic_loss = 0.5 * advantage.pow(2)
+        critic_loss = 0.5 * advantage.pow(2).mean()
 
         self.critic_optimizer.zero_grad()
         critic_loss.backward()

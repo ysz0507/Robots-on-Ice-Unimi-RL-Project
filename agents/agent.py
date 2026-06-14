@@ -1,8 +1,8 @@
 import abc
 from dataclasses import dataclass
-from typing import Sequence
 
 import numpy as np
+from torch import nn
 
 
 @dataclass(frozen=True)
@@ -24,5 +24,5 @@ class Agent(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_models(self) -> Sequence:
+    def get_models(self) -> dict[str, nn.Module]:
         pass
