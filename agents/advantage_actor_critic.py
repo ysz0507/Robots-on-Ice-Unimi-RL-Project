@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import torch
 from torch import nn
 from torch.distributions import Normal
@@ -41,17 +43,20 @@ class ValueNetwork(nn.Module):
 
 class AdvantageActorCriticAgent(Agent):
 
-    def __init__(self, state_dim=2, action_dim=2):
-        self.policy_net = PolicyNetwork(state_dim, action_dim)
-        self.value_net = ValueNetwork(state_dim)
+    def get_models(self) -> Sequence:
+        return self.actor, self.critic
+
+    def __init__(self, state_dim=4, action_dim=2):
+        self.actor = PolicyNetwork(state_dim, action_dim)
+        self.critic = ValueNetwork(state_dim)
 
         self.actor_optimizer = torch.optim.Adam(
-            self.policy_net.parameters(),
+            self.actor.parameters(),
             lr=TrainingSettings.ACTOR_LEARNING_RATE,
         )
 
         self.critic_optimizer = torch.optim.Adam(
-            self.value_net.parameters(),
+            self.critic.parameters(),
             lr=TrainingSettings.CRITIC_LEARNING_RATE,
         )
 
@@ -62,73 +67,53 @@ class AdvantageActorCriticAgent(Agent):
         if not torch.is_tensor(state):
             state = torch.tensor(state, dtype=torch.float32)
 
-        mean, std = self.policy_net(state)
+        mean, std = self.actor(state)
 
         dist = Normal(mean, std)
         action = dist.sample()
 
         return action.detach().numpy()
 
-    def train(self, transitions: list[Transition]):
-        states = []
-        actions = []
-        rewards = []
-        next_states = []
-        dones = []
+    def train(self, transitions: list[Transition]) -> tuple[float, float]:
+        total_actor_loss = 0.0
+        total_critic_loss = 0.0
         for t in transitions:
-            states.append(t.state)
-            actions.append(t.action)
-            rewards.append(t.reward)
-            next_states.append(t.next_state)
-            dones.append(t.done)
-
-        states = torch.stack(states)
-        actions = torch.stack(actions)
-        rewards = torch.tensor(rewards, dtype=torch.float32)
-        next_states = torch.stack(next_states)
-        dones = torch.tensor(dones, dtype=torch.float32)
-
-        # ---- Critic targets ----
-
-        values = self.value_net(states)
-
-        with torch.no_grad():
-            next_values = self.value_net(next_states)
-
-            targets = rewards + (
-                    self.gamma
-                    * next_values
-                    * (1.0 - dones)
+            actor_loss, critic_loss = self.__train_single_transition(
+                state=torch.tensor(t.state),
+                action=torch.tensor(t.action),
+                reward=t.reward,
+                next_state=torch.tensor(t.next_state),
+                done=t.done
             )
+            total_actor_loss += actor_loss
+            total_critic_loss += critic_loss
 
-        advantages = targets - values
+        return total_actor_loss / len(transitions), total_critic_loss / len(transitions)
 
-        # ---- Actor loss ----
+    def __train_single_transition(self, state, action, reward, next_state, done):
+        value = self.critic(state)
+        with torch.no_grad():
+            next_value = self.critic(next_state)
 
-        mean, std = self.policy_net(states)
+        advantage = reward + (1 - done) * self.gamma * next_value - value
+
+        # Update actor
+        mean, std = self.actor(state)
         dist = Normal(mean, std)
-
-        log_probs = dist.log_prob(actions).sum(dim=-1)
-
-        actor_loss = -(log_probs * advantages.detach()).mean()
-
-        # ---- Critic loss ----
-
-        critic_loss = advantages.pow(2).mean()
-
-        # ---- Update actor ----
+        # Omitting 1/(1-gamma) factor since it doesn't affect the optimization
+        log_prob = dist.log_prob(action).sum()  # TODO Verify that this is correct for multi-dimensional actions
+        actor_loss = -(log_prob * advantage.detach())
 
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
 
-        # ---- Update critic ----
+        # Update critic
+        # Equivalent to w←w+βδ∇V(St)
+        critic_loss = 0.5 * advantage.pow(2)
 
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()
 
-        return {
-            "actor_loss": actor_loss.item(),
-            "critic_loss": critic_loss.item(),
-        }
+        return actor_loss.item(), critic_loss.item()

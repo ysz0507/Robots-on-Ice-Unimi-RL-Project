@@ -1,4 +1,4 @@
-import json
+import abc
 
 import numpy as np
 
@@ -6,7 +6,7 @@ from agents.agent import Agent, Transition
 from settings import RenderingSettings
 
 
-class ScalingWrapper(Agent):
+class ScalingWrapper(Agent, metaclass=abc.ABCMeta):
     def __init__(self, model: Agent):
         self.model = model
         self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
@@ -23,7 +23,10 @@ class ScalingWrapper(Agent):
         normalized_action = self.model.select_action(normalized_state)
         return normalized_action * self.max_action
 
-    def train(self, transitions: list[Transition]):
+    def get_models(self):
+        return self.model.get_models()
+
+    def train(self, transitions: list[Transition]) -> tuple[float, float]:
         for i in range(len(transitions)):
             transitions[i] = Transition(
                 state=self.__normalize_state(transitions[i].state),
@@ -32,5 +35,4 @@ class ScalingWrapper(Agent):
                 next_state=self.__normalize_state(transitions[i].next_state),
                 done=transitions[i].done
             )
-        losses = self.model.train(transitions)
-        print(json.dumps(losses, indent=4))
+        return self.model.train(transitions)

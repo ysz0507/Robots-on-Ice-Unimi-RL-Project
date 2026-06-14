@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import numpy as np
 import pygame
 
@@ -6,7 +8,10 @@ from settings import RenderingSettings
 
 
 class HumanAgent(Agent):
-    def train(self, transitions: list[Transition]):
+    def get_models(self) -> Sequence:
+        return ()
+
+    def train(self, transitions: list[Transition]) -> tuple[float, float]:
         pass
 
     def __init__(self):

@@ -1,9 +1,17 @@
+from abc import ABCMeta
 from dataclasses import dataclass
+from typing import Any
 
+
+class Settings(metaclass=ABCMeta):
+    @classmethod
+    def as_dict(cls) -> dict[str, Any]:
+        return {k: v for k, v in cls.__dict__.items() if not k.startswith("_")}
 
 @dataclass(frozen=True)
-class TrainingSettings:
+class TrainingSettings(Settings):
     SEED = 47
+    LOG_FREQ = 100
     EPISODES = 1000
     BATCH_SIZE = 20
     ENERGY_COEFF = 0.1
@@ -15,7 +23,7 @@ class TrainingSettings:
 
 
 @dataclass(frozen=True)
-class RenderingSettings:
+class RenderingSettings(Settings):
     ICE_FRICTION = 0.02  # Between 0.1 and 0.01 for the assignment
     WIDTH = 1500
     HEIGHT = 1000

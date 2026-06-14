@@ -1,5 +1,6 @@
 import abc
 from dataclasses import dataclass
+from typing import Sequence
 
 import numpy as np
 
@@ -19,5 +20,9 @@ class Agent(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def train(self, transitions: list[Transition]):
+    def train(self, transitions: list[Transition]) -> tuple[float, float]:
+        pass
+
+    @abc.abstractmethod
+    def get_models(self) -> Sequence:
         pass
