@@ -48,11 +48,11 @@ class IceEnv:
         def compute_distance_penalty():
             distance = np.linalg.norm(
                 self.robot.pos - self.target.pos
-            )
+            ) / np.linalg.norm([RenderingSettings.WIDTH, RenderingSettings.HEIGHT])
             return -distance ** 2
 
         def compute_energy_penalty():
-            energy = np.linalg.norm(force)
+            energy = np.linalg.norm(force) / RenderingSettings.MAX_FORCE
             return -TrainingSettings.ENERGY_COEFF * energy ** 2
 
         return compute_distance_penalty() + compute_energy_penalty()

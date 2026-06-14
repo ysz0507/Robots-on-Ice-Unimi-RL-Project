@@ -28,6 +28,7 @@ def main():
         },
         name=f"A2C Agent Training {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     )
+    wandb.define_metric("episode")
 
     pygame.init()
     screen = pygame.display.set_mode((RenderingSettings.WIDTH, RenderingSettings.HEIGHT), flags=pygame.HIDDEN)
@@ -46,7 +47,6 @@ def main():
 
         # Collect one trajectory
         done = False
-
         state = training_env.reset()
         while not done:
             action = agent.select_action(state)
@@ -75,15 +75,16 @@ def main():
             buffer.sample(TrainingSettings.BATCH_SIZE)
         )
 
-        wandb.log(
-            {
-                "episode": episode,
-                "episode_reward": episode_reward,
-                "actor_loss": float(actor_loss),
-                "critic_loss": float(critic_loss),
-                "buffer_size": len(buffer),
-            }
-        )
+        if episode % TrainingSettings.LOG_FREQ == 0:
+            wandb.log(
+                {
+                    "episode": episode,
+                    "episode_reward": episode_reward,
+                    "actor_loss": float(actor_loss),
+                    "critic_loss": float(critic_loss),
+                    "buffer_size": len(buffer),
+                }
+            )
 
     wandb.finish()
 
