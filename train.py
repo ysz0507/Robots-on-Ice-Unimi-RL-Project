@@ -3,6 +3,7 @@ from datetime import datetime
 
 import numpy as np
 import pygame
+import torch
 import tqdm
 
 import wandb
@@ -17,6 +18,7 @@ from settings import TrainingSettings, RenderingSettings
 def main():
     random.seed(TrainingSettings.SEED)
     np.random.seed(TrainingSettings.SEED)
+    torch.manual_seed(TrainingSettings.SEED)
 
     wandb.init(
         project="Robots-On-Ice",
