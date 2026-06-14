@@ -1,4 +1,5 @@
 import random
+import subprocess
 from datetime import datetime
 
 import numpy as np
@@ -64,7 +65,8 @@ def main():
                 eval_return += reward
                 recording_env.draw(screen)
             video = wandb.Video(recording_env.get_frames((0, 3, 2, 1)), format="mp4", fps=RenderingSettings.FPS)
-            wandb.log({"episode": episode, "video": video, "eval_return": eval_return})
+            wandb.log({"episode": episode, "video": video, "eval_return": eval_return,
+                       "eval_targets_collected": recording_env.targets_collected})
 
         actor_loss, critic_loss = agent.train(transitions)
 
@@ -75,6 +77,7 @@ def main():
                     "episode_return": episode_return,
                     "actor_loss": float(actor_loss),
                     "critic_loss": float(critic_loss),
+                    "targets_collected": training_env.targets_collected,
                 }
             )
 
@@ -84,3 +87,6 @@ if __name__ == "__main__":
         main()
     finally:
         wandb.finish()
+        pygame.quit()
+    # Shutdown
+    subprocess.run(["shutdown", "-s"])

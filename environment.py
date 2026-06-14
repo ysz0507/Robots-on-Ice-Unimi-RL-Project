@@ -17,6 +17,7 @@ class IceEnv:
 
         self.step_count = 0
         self.done = False
+        self.targets_collected = 0
 
         self.distance_normalizer = np.linalg.norm([RenderingSettings.WIDTH, RenderingSettings.HEIGHT]) * 0.8
 
@@ -32,9 +33,13 @@ class IceEnv:
         self.target.respawn()
 
         self.step_count = 0
+        self.targets_collected = 0
         self.done = False
 
         return self.get_state()
+
+    def get_targets_collected(self):
+        return self.targets_collected
 
     def get_state(self):
         """
@@ -79,6 +84,7 @@ class IceEnv:
         if self.check_target_reached():
             reward += 200  # Large positive reward for reaching the target
             self.step_count = 0
+            self.targets_collected += 1
             self.target.respawn()
 
         self.step_count += 1
