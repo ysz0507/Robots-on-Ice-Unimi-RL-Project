@@ -10,11 +10,12 @@ class Settings(metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class TrainingSettings(Settings):
+    BUFFER_SIZE = int(10e3)
     SEED = 47
     LOG_FREQ = 100
     VIDEO_FREQ = 2000
 
-    EPISODES = 100000
+    EPISODES = int(100e3)
     ENERGY_COEFF = 0.1
 
     DISCOUNT_FACTOR = 0.995
