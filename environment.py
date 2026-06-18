@@ -22,6 +22,7 @@ class IceEnv:
         self.targets_collected = 0
 
         if pygame.get_init():
+            self.font = pygame.font.SysFont("Comic Sans MS", 30)
             tile = pygame.image.load("assets/moon_tile.png").convert()
             self.background = pygame.Surface((RenderingSettings.WIDTH, RenderingSettings.HEIGHT))
             for x in range(0, RenderingSettings.WIDTH, tile.get_width()):
@@ -99,11 +100,19 @@ class IceEnv:
 
         return next_state, reward, self.done
 
+    def __draw_text(self, string, screen, position, color=(255, 255, 255)):
+        text = self.font.render(string, True, color)
+        screen.blit(text, position)
+
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
-
         self.target.draw(screen)
         self.robot.draw(screen)
+
+        self.__draw_text(f"Targets collected: {self.targets_collected}", screen, (10, 10))
+
+        time_left = RenderingSettings.DT * (RenderingSettings.MAX_STEPS_PER_EPISODE - self.total_step_count)
+        self.__draw_text(f"Time left: {time_left:.2f}s", screen, (10, 50))
 
 
 class ScaledIceEnv(IceEnv):
