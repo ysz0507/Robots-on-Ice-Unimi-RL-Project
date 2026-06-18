@@ -80,19 +80,19 @@ def main():
         if is_recording:
             video = wandb.Video(env.get_frames((0, 3, 2, 1)), format="mp4", fps=RenderingSettings.FPS)
             wandb.log({"episode": episode, "video": video, "eval/return": episode_return,
-                       "eval/targets_collected": env.targets_collected})
+                       "eval/targets_collected": env.targets_collected}, step=episode)
 
 
         if episode % TrainingSettings.LOG_FREQ == 0:
             wandb.log(
                 {
                     "episode": episode,
-                    "train/episode_return": episode_return,
+                    "train/return": episode_return,
                     "actor_loss": actor_loss.item(),
                     "critic_loss": critic_loss.item(),
                     "train/targets_collected": training_env.targets_collected,
                     "buffer_size": len(replay_buffer),
-                }
+                }, step=episode
             )
 
 
