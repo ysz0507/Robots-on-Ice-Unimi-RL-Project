@@ -36,7 +36,7 @@ class TrainingSettings(Settings):
 
 @dataclass(frozen=True)
 class RenderingSettings(Settings):
-    ICE_FRICTION = 0.01  # Between 0.1 and 0.01 for the assignment
+    ICE_FRICTION = 0.1  # Between 0.1 and 0.01 for the assignment
     WIDTH = 16 * 100  # 16m
     HEIGHT = 12 * 100  # 12m
 
