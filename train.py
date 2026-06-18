@@ -89,4 +89,4 @@ if __name__ == "__main__":
         wandb.finish()
         pygame.quit()
     # Shutdown
-    subprocess.run(["shutdown", "-s"])
+    # subprocess.run(["shutdown", "now"])

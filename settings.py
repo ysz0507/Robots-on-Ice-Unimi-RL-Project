@@ -17,7 +17,7 @@ class TrainingSettings(Settings):
     EPISODES = 100000
     ENERGY_COEFF = 0.1
 
-    DISCOUNT_FACTOR = 0.99
+    DISCOUNT_FACTOR = 0.995
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
     CRITIC_LEARNING_RATE = 1.5e-3
 
@@ -38,5 +38,5 @@ class RenderingSettings(Settings):
     MAX_FORCE = 40e3  # Newtons
     ROBOT_MASS = 75  # kg
 
-    EPISODE_TIME = 20  # seconds
+    EPISODE_TIME = 20  # 20 for the assignment seconds
     MAX_STEPS = int(EPISODE_TIME * FPS)

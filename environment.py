@@ -82,7 +82,7 @@ class IceEnv:
 
         # Target reached
         if self.check_target_reached():
-            reward += 200  # Large positive reward for reaching the target
+            reward += 300  # Large positive reward for reaching the target
             self.step_count = 0
             self.targets_collected += 1
             self.target.respawn()
