@@ -17,6 +17,7 @@ class IceEnv:
         self.target = Target()
 
         self.step_count = 0
+        self.total_step_count = 0
         self.done = False
         self.targets_collected = 0
 
@@ -32,6 +33,7 @@ class IceEnv:
         self.target.respawn()
 
         self.step_count = 0
+        self.total_step_count = 0
         self.targets_collected = 0
         self.done = False
 
@@ -81,15 +83,16 @@ class IceEnv:
 
         # Target reached
         if self.check_target_reached():
-            reward += 1e8  # Large positive reward for reaching the target
+            reward += TrainingSettings.COLLECTED_REWARD
             self.step_count = 0
             self.targets_collected += 1
             self.target.respawn()
 
         self.step_count += 1
+        self.total_step_count += 1
 
         # Episode termination
-        if self.step_count >= RenderingSettings.MAX_STEPS:
+        if self.step_count >= RenderingSettings.MAX_STEPS_PER_TARGET or self.total_step_count >= RenderingSettings.MAX_STEPS_PER_EPISODE:
             self.done = True
 
         next_state = self.get_state()

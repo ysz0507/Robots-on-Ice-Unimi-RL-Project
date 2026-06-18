@@ -19,7 +19,8 @@ class TrainingSettings(Settings):
     VIDEO_FREQ = 50
 
     EPISODES = 10_000
-    ENERGY_COEFF = 0.1  # 0-1
+    ENERGY_COEFF = 0.7  # 0-1
+    COLLECTED_REWARD = 1e6
 
     DISCOUNT_FACTOR = 0.995
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
@@ -50,5 +51,5 @@ class RenderingSettings(Settings):
     MAX_FORCE = 100  # Newtons should be 100 for the assignment
     ROBOT_MASS = 75  # kg, 50-100
 
-    EPISODE_TIME = 20  # 20 for the assignment seconds
-    MAX_STEPS = int(EPISODE_TIME * 1 / DT)
+    MAX_STEPS_PER_TARGET = int(20 / DT)
+    MAX_STEPS_PER_EPISODE = int(60 / DT)
