@@ -7,9 +7,10 @@ from settings import RenderingSettings
 
 
 class StationaryEntity:
-    def __init__(self, x, y, image_path, width):
+    def __init__(self, x, y, image_path=None, width=None):
         self.pos = np.array([x, y], dtype=np.float32)
-        self.background = self._load_image(image_path, width)
+        if image_path is not None:
+            self.background = self._load_image(image_path, width)
 
     @staticmethod
     def _load_image(path, width):
@@ -22,7 +23,7 @@ class StationaryEntity:
         )
 
     def draw(self, screen):
-        screen.blit(self.background, self.pos - self.background.get_rect().center)
+        screen.blit(self.background, 100 * self.pos - self.background.get_rect().center)
 
     def reset(self, x, y):
         self.pos[:] = [x, y]
@@ -63,23 +64,20 @@ class Robot(StationaryEntity):
 
 class Target(StationaryEntity):
     def __init__(self):
-        pos = self.__random_position()
-        super().__init__(pos[0], pos[1], self.__random_star_path(), RenderingSettings.TARGET_WIDTH)
-
-    @staticmethod
-    def __random_star_path():
-        index = random.randint(1, 4)
-        return f"assets/star_{index}.png"
+        self.star_images = [self._load_image(f"assets/star_{i}.png", RenderingSettings.TARGET_WIDTH) for i in
+                            range(1, 5)]
+        self.respawn()
+        super().__init__(*self.pos)
 
     @staticmethod
     def __random_position():
-        margin = 50
+        margin = 50  # cm
 
-        x = random.randint(margin, RenderingSettings.WIDTH - margin)
-        y = random.randint(margin, RenderingSettings.HEIGHT - margin)
+        x = random.randint(margin, RenderingSettings.WIDTH - margin) / 100
+        y = random.randint(margin, RenderingSettings.HEIGHT - margin) / 100
 
         return np.array([x, y], dtype=np.float32)
 
     def respawn(self):
-        self.background = self._load_image(self.__random_star_path(), RenderingSettings.TARGET_WIDTH)
+        self.background = random.choice(self.star_images)
         self.pos = self.__random_position()

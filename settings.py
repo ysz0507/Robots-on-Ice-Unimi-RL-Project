@@ -37,18 +37,18 @@ class TrainingSettings(Settings):
 @dataclass(frozen=True)
 class RenderingSettings(Settings):
     ICE_FRICTION = 0.01  # Between 0.1 and 0.01 for the assignment
-    WIDTH = 1504 // 2  # Use multiples of 16 for better mp4 rendering
-    HEIGHT = 1008 // 2
+    WIDTH = 16 * 100  # 16m
+    HEIGHT = 12 * 100  # 12m
 
-    FPS = 10  # 10 for the assignment
-    DT = 1.0 / FPS  # physics timestep
+    FPS = 20  # 10 for the assignment
+    DT = 0.1  # physics timestep
 
     ROBOT_WIDTH = 100
-    TARGET_WIDTH = 80
+    TARGET_WIDTH = 60
     COLLECT_DISTANCE = 60
 
-    MAX_FORCE = 100  # Newtons
-    ROBOT_MASS = 50  # kg, 50-100
+    MAX_FORCE = 100  # Newtons should be 100 for the assignment
+    ROBOT_MASS = 75  # kg, 50-100
 
     EPISODE_TIME = 20  # 20 for the assignment seconds
-    MAX_STEPS = int(EPISODE_TIME * FPS)
+    MAX_STEPS = int(EPISODE_TIME * 1 / DT)

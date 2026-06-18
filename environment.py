@@ -12,14 +12,13 @@ from settings import RenderingSettings, TrainingSettings
 
 class IceEnv:
     def __init__(self):
-        self.robot = Robot(RenderingSettings.WIDTH // 2, RenderingSettings.HEIGHT // 2, RenderingSettings.ROBOT_MASS)
+        self.robot = Robot(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200,
+                           RenderingSettings.ROBOT_MASS)
         self.target = Target()
 
         self.step_count = 0
         self.done = False
         self.targets_collected = 0
-
-        self.distance_normalizer = np.linalg.norm([RenderingSettings.WIDTH, RenderingSettings.HEIGHT]) * 0.8
 
         if pygame.get_init():
             tile = pygame.image.load("assets/moon_tile.png").convert()
@@ -29,7 +28,7 @@ class IceEnv:
                     self.background.blit(tile, (x, y))
 
     def reset(self):
-        self.robot.reset(RenderingSettings.WIDTH // 2, RenderingSettings.HEIGHT // 2)
+        self.robot.reset(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200)
         self.target.respawn()
 
         self.step_count = 0
@@ -69,7 +68,7 @@ class IceEnv:
             self.robot.pos - self.target.pos
         )
 
-        return distance < RenderingSettings.COLLECT_DISTANCE
+        return distance < RenderingSettings.COLLECT_DISTANCE / 100
 
     def step(self, action):
         """
@@ -107,7 +106,8 @@ class IceEnv:
 class ScaledIceEnv(IceEnv):
     def __init__(self):
         self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
-        self.max_state = np.array([RenderingSettings.WIDTH, RenderingSettings.HEIGHT, 30, 30], dtype=np.float32)
+        self.max_state = np.array([RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100, 10, 10],
+                                  dtype=np.float32)
         super().__init__()
 
     def __normalize_state(self, state):
