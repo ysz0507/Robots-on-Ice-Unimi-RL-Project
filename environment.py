@@ -6,7 +6,7 @@ import numpy as np
 import pygame
 
 from agents.human_agent import HumanAgent
-from entities import Robot, Target
+from entities import Robot, Target, Meteorite
 from settings import RenderingSettings, TrainingSettings
 
 
@@ -15,6 +15,8 @@ class IceEnv:
         self.robot = Robot(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200,
                            RenderingSettings.ROBOT_MASS)
         self.target = Target()
+
+        self.meteorite = Meteorite() if RenderingSettings.ENABLE_METEORITE else None
 
         self.step_count = 0
         self.total_step_count = 0
@@ -32,6 +34,8 @@ class IceEnv:
     def reset(self):
         self.robot.reset(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200)
         self.target.respawn()
+        if self.meteorite is not None:
+            self.meteorite.respawn()
 
         self.step_count = 0
         self.total_step_count = 0
@@ -47,11 +51,16 @@ class IceEnv:
         """
         Example state representation.
         """
-
-        return np.concatenate([
+        state = [
             self.target.pos - self.robot.pos,
             self.robot.vel,
-        ])
+        ]
+        if self.meteorite is not None:
+            state.extend([
+                self.meteorite.pos - self.robot.pos,
+                self.meteorite.vel
+            ])
+        return np.concatenate(state)
 
     def compute_reward(self, force):
         def compute_distance_reward():
@@ -66,12 +75,11 @@ class IceEnv:
 
         return compute_distance_reward() + compute_energy_penalty()
 
-    def check_target_reached(self):
+    def check_collision(self, entity, collider):
         distance = np.linalg.norm(
-            self.robot.pos - self.target.pos
+            self.robot.pos - entity.pos
         )
-
-        return distance < RenderingSettings.COLLECT_DISTANCE / 100
+        return distance < collider / 100
 
     def step(self, action):
         """
@@ -79,11 +87,13 @@ class IceEnv:
         """
 
         self.robot.update(action)
+        if self.meteorite is not None:
+            self.meteorite.update()
 
         reward = self.compute_reward(action)
 
         # Target reached
-        if self.check_target_reached():
+        if self.check_collision(self.target, RenderingSettings.COLLECT_DISTANCE):
             reward += TrainingSettings.COLLECTED_REWARD
             self.step_count = 0
             self.targets_collected += 1
@@ -94,6 +104,11 @@ class IceEnv:
 
         # Episode termination
         if self.step_count >= RenderingSettings.MAX_STEPS_PER_TARGET or self.total_step_count >= RenderingSettings.MAX_STEPS_PER_EPISODE:
+            self.done = True
+
+        meteorite_coll_distance = (RenderingSettings.METEORITE_WIDTH + RenderingSettings.ROBOT_WIDTH) / 2
+        if self.meteorite is not None and self.check_collision(self.meteorite, meteorite_coll_distance):
+            reward -= TrainingSettings.METEORITE_REWARD
             self.done = True
 
         next_state = self.get_state()
@@ -108,6 +123,8 @@ class IceEnv:
         screen.blit(self.background, (0, 0))
         self.target.draw(screen)
         self.robot.draw(screen)
+        if self.meteorite is not None:
+            self.meteorite.draw(screen)
 
         self.__draw_text(f"Targets collected: {self.targets_collected}", screen, (10, 10))
 
@@ -117,10 +134,13 @@ class IceEnv:
 
 class ScaledIceEnv(IceEnv):
     def __init__(self):
-        self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
-        self.max_state = np.array([RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100, 10, 10],
-                                  dtype=np.float32)
         super().__init__()
+        self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
+        max_state = [RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100, 10, 10]
+        if self.meteorite is not None:
+            max_state += [RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100,
+                          RenderingSettings.MAX_METEORITE_SPEED, RenderingSettings.MAX_METEORITE_SPEED]
+        self.max_state = np.array(max_state, dtype=np.float32)
 
     def __normalize_state(self, state):
         return state / self.max_state

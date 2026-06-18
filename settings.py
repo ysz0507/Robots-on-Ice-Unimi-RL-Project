@@ -20,7 +20,8 @@ class TrainingSettings(Settings):
 
     EPISODES = 10_000
     ENERGY_COEFF = 0.7  # 0-1
-    COLLECTED_REWARD = 1e6
+    COLLECTED_REWARD = 1e5
+    METEORITE_REWARD = -1e6
 
     DISCOUNT_FACTOR = 0.995
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
@@ -53,3 +54,7 @@ class RenderingSettings(Settings):
 
     MAX_STEPS_PER_TARGET = int(20 / DT)
     MAX_STEPS_PER_EPISODE = int(60 / DT)
+
+    ENABLE_METEORITE = False
+    METEORITE_WIDTH = 200
+    MAX_METEORITE_SPEED = 2  # m/s

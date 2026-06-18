@@ -62,6 +62,41 @@ class Robot(StationaryEntity):
         self.pos += RenderingSettings.DT * self.vel
 
 
+class Meteorite(StationaryEntity):
+    def __init__(self):
+        self.respawn()
+        super().__init__(self.pos[0], self.pos[1], "assets/meteorite.png", RenderingSettings.METEORITE_WIDTH)
+
+    def respawn(self):
+        margin = RenderingSettings.METEORITE_WIDTH // 2
+        if random.random() < 0.5:
+            y = random.choice([-margin, RenderingSettings.HEIGHT + margin])
+            x = random.randint(-margin, RenderingSettings.WIDTH + margin)
+        else:
+            x = random.choice([-margin, RenderingSettings.WIDTH + margin])
+            y = random.randint(-margin, RenderingSettings.HEIGHT + margin)
+        self.pos = np.array([x, y], dtype=np.float32) / 100
+
+        x = random.randint(margin, RenderingSettings.WIDTH - margin)
+        y = random.randint(margin, RenderingSettings.HEIGHT - margin)
+        vel = np.array([x, y], dtype=np.float32) / 100 - self.pos
+        self.vel = vel / np.linalg.norm(vel) * random.uniform(0.5, RenderingSettings.MAX_METEORITE_SPEED)
+
+        self.v_rot = random.uniform(-np.pi, np.pi)  # Random rotation speed in radians per second
+        self.rot = random.uniform(0, 2 * np.pi)  # Random initial rotation angle in radians
+
+    def update(self):
+        margin = RenderingSettings.METEORITE_WIDTH // 200
+        if min(self.pos) < -margin or self.pos[0] > RenderingSettings.WIDTH / 100 + margin or \
+                self.pos[1] > RenderingSettings.HEIGHT / 100 + margin:
+            self.respawn()
+        self.pos += RenderingSettings.DT * self.vel
+        self.rot += RenderingSettings.DT * self.v_rot
+
+    def draw(self, screen):
+        rotated_image = pygame.transform.rotate(self.background, np.degrees(self.rot))
+        screen.blit(rotated_image, 100 * self.pos - rotated_image.get_rect().center)
+
 class Target(StationaryEntity):
     def __init__(self):
         self.star_images = [self._load_image(f"assets/star_{i}.png", RenderingSettings.TARGET_WIDTH) for i in
