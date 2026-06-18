@@ -126,10 +126,10 @@ class IceEnv:
         if self.meteorite is not None:
             self.meteorite.draw(screen)
 
-        self.__draw_text(f"Targets collected: {self.targets_collected}", screen, (10, 10))
+        self.__draw_text(f"Targets collected: {self.targets_collected}", screen, (15, 10))
 
         time_left = RenderingSettings.DT * (RenderingSettings.MAX_STEPS_PER_EPISODE - self.total_step_count)
-        self.__draw_text(f"Time left: {time_left:.2f}s", screen, (10, 50))
+        self.__draw_text(f"Time left: {time_left:.2f}s", screen, (15, 50))
 
 
 class ScaledIceEnv(IceEnv):
@@ -188,7 +188,7 @@ def main():
 
     clock = pygame.time.Clock()
 
-    env = RecordedIceEnv()
+    env = ScaledIceEnv()
     agent = HumanAgent()
 
     running = True
@@ -212,7 +212,6 @@ def main():
         clock.tick(RenderingSettings.FPS)
 
     pygame.quit()
-    env.save_recording()
 
 
 if __name__ == "__main__":
