@@ -20,7 +20,7 @@ class Agent(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def train(self, *args, **kwargs) -> tuple[float, float]:
+    def train(self, *args, **kwargs):
         pass
 
     @abc.abstractmethod

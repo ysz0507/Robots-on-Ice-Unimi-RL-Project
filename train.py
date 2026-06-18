@@ -38,19 +38,21 @@ def main():
     recording_env = RecordedIceEnv()
     agent: Agent = SACAgent()
 
-    wandb.watch(agent.get_models(), log="all", log_freq=TrainingSettings.LOG_FREQ)
+    # wandb.watch(agent.get_models(), log="all", log_freq=TrainingSettings.LOG_FREQ)
 
     replay_buffer = ReplayBuffer(TrainingSettings.BUFFER_SIZE)
 
     # Fill up replay buffer
-    while len(replay_buffer) < TrainingSettings.WARMUP_STEPS:
-        state = training_env.reset()
-        done = False
-        while not done:
-            action = agent.select_action(state)
-            next_state, reward, done = training_env.step(action)
-            replay_buffer.store(Transition(state, action, reward, next_state, done))
-            state = next_state
+    with tqdm.tqdm(total=TrainingSettings.WARMUP_STEPS, desc="Warmup") as pbar:
+        while len(replay_buffer) < TrainingSettings.WARMUP_STEPS:
+            state = training_env.reset()
+            done = False
+            while not done:
+                action = agent.select_action(state)
+                next_state, reward, done = training_env.step(action)
+                replay_buffer.store(Transition(state, action, reward, next_state, done))
+                pbar.update(1)
+                state = next_state
 
     # Actual training
     for episode in tqdm.tqdm(range(TrainingSettings.EPISODES)):
@@ -86,8 +88,8 @@ def main():
                 {
                     "episode": episode,
                     "train/episode_return": episode_return,
-                    "actor_loss": float(actor_loss),
-                    "critic_loss": float(critic_loss),
+                    "actor_loss": actor_loss.item(),
+                    "critic_loss": critic_loss.item(),
                     "train/targets_collected": training_env.targets_collected,
                     "buffer_size": len(replay_buffer),
                 }

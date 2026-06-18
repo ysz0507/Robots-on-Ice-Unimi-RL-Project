@@ -10,12 +10,13 @@ class Settings(metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class TrainingSettings(Settings):
-    WARMUP_STEPS = 2000
+    WARMUP_STEPS = 10000
     BUFFER_SIZE = int(500e3)
     BATCH_SIZE = 256
     SEED = 47
-    LOG_FREQ = 50
-    VIDEO_FREQ = 300
+
+    LOG_FREQ = 10
+    VIDEO_FREQ = 50
 
     EPISODES = int(10e3)
     ENERGY_COEFF = 0.1

@@ -220,7 +220,7 @@ class SACAgent(Agent):
         rewards:     torch.Tensor,   # (B,)
         next_states: torch.Tensor,   # (B, state_dim)
         dones:       torch.Tensor,   # (B,)
-    ) -> tuple[float, float]:
+    ):
         """
         One gradient step for the critic, actor, and temperature.
 
@@ -287,4 +287,4 @@ class SACAgent(Agent):
         # ------------------------------------------------------------------ #
         self._soft_update_target()
 
-        return critic_loss.item(), actor_loss.item()
+        return critic_loss, actor_loss
