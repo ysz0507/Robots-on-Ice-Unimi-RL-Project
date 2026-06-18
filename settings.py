@@ -21,6 +21,14 @@ class TrainingSettings(Settings):
     DISCOUNT_FACTOR = 0.995
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
     CRITIC_LEARNING_RATE = 1.5e-3
+    ALPHA_LEARNING_RATE = 3e-4
+
+    HIDDEN_ACTOR_NODES = 256
+    HIDDEN_CRITIC_NODES = 256
+
+    TAU = 0.005
+    INIT_ALPHA = 0.2
+    TARGET_ENTROPY = -2  # -action_dim for automatic entropy tuning
 
 
 @dataclass(frozen=True)
