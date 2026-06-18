@@ -55,6 +55,6 @@ class RenderingSettings(Settings):
     MAX_STEPS_PER_TARGET = int(20 / DT)
     MAX_STEPS_PER_EPISODE = int(60 / DT)
 
-    ENABLE_METEORITE = False
+    ENABLE_METEORITE = True
     METEORITE_WIDTH = 200
     MAX_METEORITE_SPEED = 2  # m/s

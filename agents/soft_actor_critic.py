@@ -5,7 +5,7 @@ from torch import nn
 from torch.distributions import Normal
 
 from agents.agent import Agent
-from settings import TrainingSettings
+from settings import TrainingSettings, RenderingSettings
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +141,7 @@ class SACAgent(Agent):
     # ------------------------------------------------------------------
 
     def __init__(self):
-        state_dim  = 4
+        state_dim = 8 if RenderingSettings.ENABLE_METEORITE else 4
         action_dim = 2
         self.gamma = TrainingSettings.DISCOUNT_FACTOR
         self.tau = TrainingSettings.TAU
