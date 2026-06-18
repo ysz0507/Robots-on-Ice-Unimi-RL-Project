@@ -55,14 +55,14 @@ class IceEnv:
         def compute_distance_reward():
             distance = np.linalg.norm(
                 self.robot.pos - self.target.pos
-            ) / self.distance_normalizer
-            return 0.3 / (distance + 0.25) - 0.2
+            )
+            return -distance ** 2
 
         def compute_energy_penalty():
             energy = np.linalg.norm(force)
-            return -TrainingSettings.ENERGY_COEFF * energy ** 2
+            return -TrainingSettings.ENERGY_COEFF / 100 * energy ** 2
 
-        return compute_distance_reward()
+        return compute_distance_reward() + compute_energy_penalty()
 
     def check_target_reached(self):
         distance = np.linalg.norm(
@@ -82,7 +82,8 @@ class IceEnv:
 
         # Target reached
         if self.check_target_reached():
-            reward += 300  # Large positive reward for reaching the target
+            reward += 1e8  # Large positive reward for reaching the target
+            self.step_count = 0
             self.targets_collected += 1
             self.target.respawn()
 
@@ -106,24 +107,22 @@ class IceEnv:
 class ScaledIceEnv(IceEnv):
     def __init__(self):
         self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
-        self.max_state = np.array([RenderingSettings.WIDTH, RenderingSettings.HEIGHT, 100, 100], dtype=np.float32)
+        self.max_state = np.array([RenderingSettings.WIDTH, RenderingSettings.HEIGHT, 30, 30], dtype=np.float32)
         super().__init__()
 
     def __normalize_state(self, state):
         return state / self.max_state
 
-    def __normalize_action(self, action):
-        return action / self.max_action
+    def __denormalize(self, action):
+        return action * self.max_action
 
     def get_state(self):
         state = super().get_state()
         return self.__normalize_state(state)
 
     def step(self, action):
-        normalized_action = self.__normalize_action(action)
-        next_state, reward, done = super().step(normalized_action * self.max_action)
-        return self.__normalize_state(next_state), reward, done
-
+        denormalized_action = self.__denormalize(action)
+        return super().step(denormalized_action)
 
 class RecordedIceEnv(ScaledIceEnv):
     def __init__(self, recording_dir: str = f"/tmp/robots_on_ice/"):
@@ -160,7 +159,6 @@ def main():
     env = RecordedIceEnv()
     agent = HumanAgent()
 
-    state = env.reset()
     running = True
 
     while running:
@@ -168,16 +166,16 @@ def main():
             if (event.type == pygame.QUIT or
                     (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):
                 running = False
-        action = agent.select_action(state)
-        _, reward, done = env.step(action)
-        print(reward)
+        action = agent.select_action(None)
+        state, reward, done = env.step(action)
+        print(state)
 
         env.draw(screen)
         pygame.display.flip()
 
         if done:
             print("Episode finished")
-            state = env.reset()
+            env.reset()
 
         clock.tick(RenderingSettings.FPS)
 

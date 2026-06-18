@@ -10,24 +10,24 @@ class Settings(metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class TrainingSettings(Settings):
-    WARMUP_STEPS = 10000
-    BUFFER_SIZE = int(500e3)
+    WARMUP_STEPS = 50_000
+    BUFFER_SIZE = 100_000
     BATCH_SIZE = 256
     SEED = 47
 
     LOG_FREQ = 10
     VIDEO_FREQ = 50
 
-    EPISODES = int(10e3)
-    ENERGY_COEFF = 0.1
+    EPISODES = 10_000
+    ENERGY_COEFF = 0.1  # 0-1
 
-    DISCOUNT_FACTOR = 0.99
+    DISCOUNT_FACTOR = 0.995
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
     CRITIC_LEARNING_RATE = 1.5e-3
     ALPHA_LEARNING_RATE = 3e-4
 
-    HIDDEN_ACTOR_NODES = 256
-    HIDDEN_CRITIC_NODES = 256
+    HIDDEN_ACTOR_NODES = 128
+    HIDDEN_CRITIC_NODES = 128
 
     TAU = 0.005
     INIT_ALPHA = 0.2
@@ -36,9 +36,9 @@ class TrainingSettings(Settings):
 
 @dataclass(frozen=True)
 class RenderingSettings(Settings):
-    ICE_FRICTION = 0.02  # Between 0.1 and 0.01 for the assignment
-    WIDTH = 1504  # Use multiples of 16 for better mp4 rendering
-    HEIGHT = 1008
+    ICE_FRICTION = 0.01  # Between 0.1 and 0.01 for the assignment
+    WIDTH = 1504 // 2  # Use multiples of 16 for better mp4 rendering
+    HEIGHT = 1008 // 2
 
     FPS = 10  # 10 for the assignment
     DT = 1.0 / FPS  # physics timestep
@@ -47,8 +47,8 @@ class RenderingSettings(Settings):
     TARGET_WIDTH = 80
     COLLECT_DISTANCE = 60
 
-    MAX_FORCE = 40e3  # Newtons
-    ROBOT_MASS = 75  # kg
+    MAX_FORCE = 100  # Newtons
+    ROBOT_MASS = 50  # kg, 50-100
 
     EPISODE_TIME = 20  # 20 for the assignment seconds
     MAX_STEPS = int(EPISODE_TIME * FPS)

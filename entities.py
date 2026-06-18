@@ -47,16 +47,18 @@ class Robot(StationaryEntity):
         """
 
         # Clamp force magnitude
-        norm = np.linalg.norm(force)
+        norm = np.linalg.norm(force)  # Newtons
         if norm > RenderingSettings.MAX_FORCE:
             force = force / norm * RenderingSettings.MAX_FORCE
 
-        # Position update
-        self.pos += RenderingSettings.DT * self.vel
+        a = force / self.mass  # Acceleration in m/s^2
 
         # Velocity update
-        self.vel += RenderingSettings.DT * (force / self.mass)
-        self.vel -= RenderingSettings.ICE_FRICTION * self.vel
+        self.vel += RenderingSettings.DT * a
+        self.vel += 0.1 * (a - RenderingSettings.ICE_FRICTION * self.vel)
+
+        # Position update
+        self.pos += RenderingSettings.DT * self.vel
 
 
 class Target(StationaryEntity):

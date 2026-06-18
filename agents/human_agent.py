@@ -16,10 +16,10 @@ class HumanAgent(Agent):
 
     def __init__(self):
         self.key_mapping = {
-            pygame.K_UP: (0.0, -RenderingSettings.MAX_FORCE),
-            pygame.K_DOWN: (0.0, RenderingSettings.MAX_FORCE),
-            pygame.K_LEFT: (-RenderingSettings.MAX_FORCE, 0.0),
-            pygame.K_RIGHT: (RenderingSettings.MAX_FORCE, 0.0)
+            pygame.K_UP: (0.0, -1),
+            pygame.K_DOWN: (0.0, 1),
+            pygame.K_LEFT: (-1, 0.0),
+            pygame.K_RIGHT: (1, 0.0)
         }
         if not pygame.get_init():
             raise RuntimeError("Pygame must be initialized for HumanAgents.")

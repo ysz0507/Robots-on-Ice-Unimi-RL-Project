@@ -205,7 +205,7 @@ class SACAgent(Agent):
         Uses the stochastic policy during training and the deterministic
         mean at evaluation time — here we default to stochastic.
         """
-        state_t = torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0)
+        state_t = torch.tensor(state, dtype=torch.float32, device=self.device)
         action, _, _ = self.actor.sample(state_t)
         return action.squeeze(0).cpu().numpy()
 
