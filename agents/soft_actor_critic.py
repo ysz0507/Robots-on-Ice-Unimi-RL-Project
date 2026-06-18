@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torch.distributions import Normal
 
-from agents.agent import Transition, Agent
+from agents.agent import Agent
 from settings import TrainingSettings
 
 
@@ -141,8 +141,6 @@ class SACAgent(Agent):
     # ------------------------------------------------------------------
 
     def __init__(self):
-        cfg = TrainingSettings()
-
         state_dim  = 4
         action_dim = 2
         self.gamma = TrainingSettings.DISCOUNT_FACTOR
@@ -152,7 +150,7 @@ class SACAgent(Agent):
         # ---- Actor -------------------------------------------------------
         self.actor = GaussianActor(state_dim, action_dim, TrainingSettings.HIDDEN_ACTOR_NODES).to(self.device)
         self.actor_optimizer = torch.optim.Adam(
-            self.actor.parameters(), lr=getattr(cfg, "lr_actor", 3e-4)
+            self.actor.parameters(), lr=TrainingSettings.ACTOR_LEARNING_RATE
         )
 
         # ---- Critics (online + target) -----------------------------------
@@ -212,23 +210,10 @@ class SACAgent(Agent):
         return action.squeeze(0).cpu().numpy()
 
     # ------------------------------------------------------------------
-    # Training entry-point (public)
-    # ------------------------------------------------------------------
-
-    def train(self, transitions: list[Transition]) -> tuple[float, float]:
-        return self.__train_batch(
-            states=torch.stack([torch.tensor(t.state,      dtype=torch.float32) for t in transitions]),
-            actions=torch.stack([torch.tensor(t.action,    dtype=torch.float32) for t in transitions]),
-            rewards=torch.tensor([t.reward                                      for t in transitions], dtype=torch.float32),
-            next_states=torch.stack([torch.tensor(t.next_state, dtype=torch.float32) for t in transitions]),
-            dones=torch.tensor([t.done                                          for t in transitions], dtype=torch.float32),
-        )
-
-    # ------------------------------------------------------------------
     # Core SAC update (private)
     # ------------------------------------------------------------------
 
-    def __train_batch(
+    def train(
         self,
         states:      torch.Tensor,   # (B, state_dim)
         actions:     torch.Tensor,   # (B, action_dim)
@@ -246,9 +231,9 @@ class SACAgent(Agent):
         """
         states      = states.to(self.device)
         actions     = actions.to(self.device)
-        rewards     = rewards.to(self.device).unsqueeze(-1)   # (B, 1)
+        rewards = rewards.to(self.device)  # (B, 1)
         next_states = next_states.to(self.device)
-        dones       = dones.to(self.device).unsqueeze(-1)     # (B, 1)
+        dones = dones.to(self.device)  # (B, 1)
 
         alpha = self.alpha.detach()   # treat as constant when updating critic
 

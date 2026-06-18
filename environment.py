@@ -83,7 +83,6 @@ class IceEnv:
         # Target reached
         if self.check_target_reached():
             reward += 300  # Large positive reward for reaching the target
-            self.step_count = 0
             self.targets_collected += 1
             self.target.respawn()
 
@@ -104,7 +103,29 @@ class IceEnv:
         self.robot.draw(screen)
 
 
-class RecordedIceEnv(IceEnv):
+class ScaledIceEnv(IceEnv):
+    def __init__(self):
+        self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
+        self.max_state = np.array([RenderingSettings.WIDTH, RenderingSettings.HEIGHT, 100, 100], dtype=np.float32)
+        super().__init__()
+
+    def __normalize_state(self, state):
+        return state / self.max_state
+
+    def __normalize_action(self, action):
+        return action / self.max_action
+
+    def get_state(self):
+        state = super().get_state()
+        return self.__normalize_state(state)
+
+    def step(self, action):
+        normalized_action = self.__normalize_action(action)
+        next_state, reward, done = super().step(normalized_action * self.max_action)
+        return self.__normalize_state(next_state), reward, done
+
+
+class RecordedIceEnv(ScaledIceEnv):
     def __init__(self, recording_dir: str = f"/tmp/robots_on_ice/"):
         super().__init__()
         self.recording_dir = Path(recording_dir)

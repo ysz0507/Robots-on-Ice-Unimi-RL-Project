@@ -10,15 +10,17 @@ class Settings(metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class TrainingSettings(Settings):
-    BUFFER_SIZE = int(10e3)
+    WARMUP_STEPS = 2000
+    BUFFER_SIZE = int(500e3)
+    BATCH_SIZE = 256
     SEED = 47
-    LOG_FREQ = 100
-    VIDEO_FREQ = 2000
+    LOG_FREQ = 50
+    VIDEO_FREQ = 300
 
-    EPISODES = int(100e3)
+    EPISODES = int(10e3)
     ENERGY_COEFF = 0.1
 
-    DISCOUNT_FACTOR = 0.995
+    DISCOUNT_FACTOR = 0.99
     ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
     CRITIC_LEARNING_RATE = 1.5e-3
     ALPHA_LEARNING_RATE = 3e-4
