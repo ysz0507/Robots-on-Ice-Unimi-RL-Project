@@ -200,7 +200,8 @@ def main():
                 running = False
         action = agent.select_action(None)
         state, reward, done = env.step(action)
-        print(state)
+        # print(state)
+        print(reward)
 
         env.draw(screen)
         pygame.display.flip()
