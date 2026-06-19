@@ -7,7 +7,7 @@ from settings import RenderingSettings
 
 class ReplayBuffer:
     def __init__(self, capacity):
-        state_dim = 8 if RenderingSettings.ENABLE_METEORITE else 4
+        state_dim = 8 if RenderingSettings().ENABLE_METEORITE else 4
         action_dim = 2
         self.capacity = capacity
         self.position = 0

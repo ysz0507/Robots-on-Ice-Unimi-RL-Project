@@ -35,7 +35,7 @@ class HumanAgent(Agent):
 
         # Clamp force magnitude
         norm = np.linalg.norm(force)
-        if norm > RenderingSettings.MAX_FORCE:
-            force = force / norm * RenderingSettings.MAX_FORCE
+        if norm > RenderingSettings().MAX_FORCE:
+            force = force / norm * RenderingSettings().MAX_FORCE
 
         return force

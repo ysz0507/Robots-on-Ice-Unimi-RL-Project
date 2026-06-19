@@ -52,15 +52,15 @@ class AdvantageActorCriticAgent(Agent):
 
         self.actor_optimizer = torch.optim.Adam(
             self.actor.parameters(),
-            lr=TrainingSettings.ACTOR_LEARNING_RATE,
+            lr=TrainingSettings().ACTOR_LEARNING_RATE,
         )
 
         self.critic_optimizer = torch.optim.Adam(
             self.critic.parameters(),
-            lr=TrainingSettings.CRITIC_LEARNING_RATE,
+            lr=TrainingSettings().CRITIC_LEARNING_RATE,
         )
 
-        self.gamma = TrainingSettings.DISCOUNT_FACTOR
+        self.gamma = TrainingSettings().DISCOUNT_FACTOR
 
     @torch.no_grad()
     def select_action(self, state):

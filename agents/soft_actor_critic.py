@@ -141,32 +141,32 @@ class SACAgent(Agent):
     # ------------------------------------------------------------------
 
     def __init__(self):
-        state_dim = 8 if RenderingSettings.ENABLE_METEORITE else 4
+        state_dim = 8 if RenderingSettings().ENABLE_METEORITE else 4
         action_dim = 2
-        self.gamma = TrainingSettings.DISCOUNT_FACTOR
-        self.tau = TrainingSettings.TAU
+        self.gamma = TrainingSettings().DISCOUNT_FACTOR
+        self.tau = TrainingSettings().TAU
         self.device = torch.device("cuda")
 
         # ---- Actor -------------------------------------------------------
-        self.actor = GaussianActor(state_dim, action_dim, TrainingSettings.HIDDEN_ACTOR_NODES).to(self.device)
+        self.actor = GaussianActor(state_dim, action_dim, TrainingSettings().HIDDEN_ACTOR_NODES).to(self.device)
         self.actor_optimizer = torch.optim.Adam(
-            self.actor.parameters(), lr=TrainingSettings.ACTOR_LEARNING_RATE
+            self.actor.parameters(), lr=TrainingSettings().ACTOR_LEARNING_RATE
         )
 
         # ---- Critics (online + target) -----------------------------------
-        self.critic = TwinQNetwork(state_dim, action_dim, TrainingSettings.HIDDEN_CRITIC_NODES).to(self.device)
-        self.critic_target = TwinQNetwork(state_dim, action_dim, TrainingSettings.HIDDEN_CRITIC_NODES).to(self.device)
+        self.critic = TwinQNetwork(state_dim, action_dim, TrainingSettings().HIDDEN_CRITIC_NODES).to(self.device)
+        self.critic_target = TwinQNetwork(state_dim, action_dim, TrainingSettings().HIDDEN_CRITIC_NODES).to(self.device)
         self.critic_target.load_state_dict(self.critic.state_dict())
         for p in self.critic_target.parameters():
             p.requires_grad = False
 
         self.critic_optimizer = torch.optim.Adam(
-            self.critic.parameters(), lr=TrainingSettings.CRITIC_LEARNING_RATE
+            self.critic.parameters(), lr=TrainingSettings().CRITIC_LEARNING_RATE
         )
 
         # ---- Automatic entropy tuning ------------------------------------
-        self.target_entropy = TrainingSettings.TARGET_ENTROPY
-        init_alpha = TrainingSettings.INIT_ALPHA
+        self.target_entropy = TrainingSettings().TARGET_ENTROPY
+        init_alpha = TrainingSettings().INIT_ALPHA
         # log_alpha is the learnable parameter; alpha = exp(log_alpha) ≥ 0
         self.log_alpha = torch.tensor(
             [torch.log(torch.tensor(init_alpha))],
@@ -175,7 +175,7 @@ class SACAgent(Agent):
             requires_grad=True,
         )
         self.alpha_optimizer = torch.optim.Adam(
-            [self.log_alpha], lr=TrainingSettings.ALPHA_LEARNING_RATE
+            [self.log_alpha], lr=TrainingSettings().ALPHA_LEARNING_RATE
         )
 
     # ------------------------------------------------------------------

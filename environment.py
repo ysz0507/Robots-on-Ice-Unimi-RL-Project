@@ -12,11 +12,11 @@ from settings import RenderingSettings, TrainingSettings
 
 class IceEnv:
     def __init__(self):
-        self.robot = Robot(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200,
-                           RenderingSettings.ROBOT_MASS)
+        self.robot = Robot(RenderingSettings().WIDTH // 200, RenderingSettings().HEIGHT // 200,
+                           RenderingSettings().ROBOT_MASS)
         self.target = Target()
 
-        self.meteorite = Meteorite() if RenderingSettings.ENABLE_METEORITE else None
+        self.meteorite = Meteorite() if RenderingSettings().ENABLE_METEORITE else None
 
         self.step_count = 0
         self.total_step_count = 0
@@ -26,13 +26,13 @@ class IceEnv:
         if pygame.get_init():
             self.font = pygame.font.SysFont("Comic Sans MS", 30)
             tile = pygame.image.load("assets/moon_tile.png").convert()
-            self.background = pygame.Surface((RenderingSettings.WIDTH, RenderingSettings.HEIGHT))
-            for x in range(0, RenderingSettings.WIDTH, tile.get_width()):
-                for y in range(0, RenderingSettings.HEIGHT, tile.get_height()):
+            self.background = pygame.Surface((RenderingSettings().WIDTH, RenderingSettings().HEIGHT))
+            for x in range(0, RenderingSettings().WIDTH, tile.get_width()):
+                for y in range(0, RenderingSettings().HEIGHT, tile.get_height()):
                     self.background.blit(tile, (x, y))
 
     def reset(self):
-        self.robot.reset(RenderingSettings.WIDTH // 200, RenderingSettings.HEIGHT // 200)
+        self.robot.reset(RenderingSettings().WIDTH // 200, RenderingSettings().HEIGHT // 200)
         self.target.respawn()
         if self.meteorite is not None:
             self.meteorite.respawn()
@@ -71,7 +71,7 @@ class IceEnv:
 
         def compute_energy_penalty():
             energy = np.linalg.norm(force)
-            return -TrainingSettings.ENERGY_COEFF / 100 * energy ** 2
+            return -TrainingSettings().ENERGY_COEFF / 100 * energy ** 2
 
         return compute_distance_reward() + compute_energy_penalty()
 
@@ -93,8 +93,8 @@ class IceEnv:
         reward = self.compute_reward(action)
 
         # Target reached
-        if self.check_collision(self.target, RenderingSettings.COLLECT_DISTANCE):
-            reward += TrainingSettings.COLLECTED_REWARD
+        if self.check_collision(self.target, RenderingSettings().COLLECT_DISTANCE):
+            reward += TrainingSettings().COLLECTED_REWARD
             self.step_count = 0
             self.targets_collected += 1
             self.target.respawn()
@@ -103,12 +103,12 @@ class IceEnv:
         self.total_step_count += 1
 
         # Episode termination
-        if self.step_count >= RenderingSettings.MAX_STEPS_PER_TARGET or self.total_step_count >= RenderingSettings.MAX_STEPS_PER_EPISODE:
+        if self.step_count >= RenderingSettings().MAX_STEPS_PER_TARGET or self.total_step_count >= RenderingSettings().MAX_STEPS_PER_EPISODE:
             self.done = True
 
-        meteorite_coll_distance = (RenderingSettings.METEORITE_WIDTH + RenderingSettings.ROBOT_WIDTH) / 2
+        meteorite_coll_distance = (RenderingSettings().METEORITE_WIDTH + RenderingSettings().ROBOT_WIDTH) / 2
         if self.meteorite is not None and self.check_collision(self.meteorite, meteorite_coll_distance):
-            reward -= TrainingSettings.METEORITE_REWARD
+            reward -= TrainingSettings().METEORITE_REWARD
             self.done = True
 
         next_state = self.get_state()
@@ -128,18 +128,18 @@ class IceEnv:
 
         self.__draw_text(f"Targets collected: {self.targets_collected}", screen, (15, 10))
 
-        time_left = RenderingSettings.DT * (RenderingSettings.MAX_STEPS_PER_EPISODE - self.total_step_count)
+        time_left = RenderingSettings().DT * (RenderingSettings().MAX_STEPS_PER_EPISODE - self.total_step_count)
         self.__draw_text(f"Time left: {time_left:.2f}s", screen, (15, 50))
 
 
 class ScaledIceEnv(IceEnv):
     def __init__(self):
         super().__init__()
-        self.max_action = np.array([RenderingSettings.MAX_FORCE, RenderingSettings.MAX_FORCE], dtype=np.float32)
-        max_state = [RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100, 10, 10]
+        self.max_action = np.array([RenderingSettings().MAX_FORCE, RenderingSettings().MAX_FORCE], dtype=np.float32)
+        max_state = [RenderingSettings().WIDTH / 100, RenderingSettings().HEIGHT / 100, 10, 10]
         if self.meteorite is not None:
-            max_state += [RenderingSettings.WIDTH / 100, RenderingSettings.HEIGHT / 100,
-                          RenderingSettings.MAX_METEORITE_SPEED, RenderingSettings.MAX_METEORITE_SPEED]
+            max_state += [RenderingSettings().WIDTH / 100, RenderingSettings().HEIGHT / 100,
+                          RenderingSettings().MAX_METEORITE_SPEED, RenderingSettings().MAX_METEORITE_SPEED]
         self.max_state = np.array(max_state, dtype=np.float32)
 
     def __normalize_state(self, state):
@@ -171,7 +171,7 @@ class RecordedIceEnv(ScaledIceEnv):
     def save_recording(self) -> Path:
         video_path = self.recording_dir / (datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".mp4")
         # noinspection PyTypeChecker
-        imageio.mimsave(video_path, self.get_frames((0, 2, 1, 3)), fps=RenderingSettings.FPS)
+        imageio.mimsave(video_path, self.get_frames((0, 2, 1, 3)), fps=RenderingSettings().FPS)
         print(f"Recording saved to {video_path}")
         self.frames = []
         return video_path
@@ -184,7 +184,7 @@ class RecordedIceEnv(ScaledIceEnv):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((RenderingSettings.WIDTH, RenderingSettings.HEIGHT))
+    screen = pygame.display.set_mode((RenderingSettings().WIDTH, RenderingSettings().HEIGHT))
     pygame.display.set_caption("Robots on Ice")
 
     clock = pygame.time.Clock()
@@ -211,7 +211,7 @@ def main():
             print("Episode finished")
             env.reset()
 
-        clock.tick(RenderingSettings.FPS)
+        clock.tick(RenderingSettings().FPS)
 
     pygame.quit()
 
