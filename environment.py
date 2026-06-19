@@ -165,7 +165,8 @@ class RecordedIceEnv(ScaledIceEnv):
 
     def draw(self, screen):
         super().draw(screen)
-        self.frames.append(pygame.surfarray.array3d(screen))
+        scaled_surface = pygame.transform.scale(screen, (screen.get_width() // 2, screen.get_height() // 2))
+        self.frames.append(pygame.surfarray.array3d(scaled_surface))
 
     def save_recording(self) -> Path:
         video_path = self.recording_dir / (datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".mp4")
