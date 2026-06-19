@@ -95,11 +95,26 @@ def main():
             )
 
 
+def train():
+    for seed in (42, 43, 44):
+        TrainingSettings().SEED = seed
+        try:
+            main()
+        finally:
+            wandb.finish()
+            pygame.quit()
+    TrainingSettings.clear_instance()
+    RenderingSettings.clear_instance()
+
+
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        wandb.finish()
-        pygame.quit()
+    for c in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):
+        TrainingSettings().ENERGY_COEFF = c
+        train()
+
+    for weight in (50, 60, 70, 80, 90, 100):
+        RenderingSettings.ROBOT_MASS = weight
+        train()
+
     # Shutdown
     # subprocess.run(["shutdown", "now"])
