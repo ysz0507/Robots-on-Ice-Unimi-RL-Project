@@ -287,4 +287,4 @@ class SACAgent(Agent):
         # ------------------------------------------------------------------ #
         self._soft_update_target()
 
-        return critic_loss, actor_loss
+        return actor_loss.detach(), critic_loss.detach()

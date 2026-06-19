@@ -113,7 +113,7 @@ if __name__ == "__main__":
         train()
 
     for weight in (50, 60, 70, 80, 90, 100):
-        RenderingSettings.ROBOT_MASS = weight
+        RenderingSettings().ROBOT_MASS = weight
         train()
 
     # Shutdown
