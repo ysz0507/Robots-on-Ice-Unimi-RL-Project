@@ -19,7 +19,7 @@ from settings import RenderingSettings, TrainingSettings
 os.environ["WANDB_SILENT"] = "true"
 
 # --- Optimization budget (reduce for faster search) ---
-N_TRIALS = 50
+N_TRIALS = 200
 OPTUNA_EPISODES = 400
 
 
@@ -29,18 +29,19 @@ def objective(trial: optuna.Trial) -> float:
     RenderingSettings.clear_instance()
 
     # ── Training hyperparameters ──────────────────────────────────────────────
-    TrainingSettings().DISCOUNT_FACTOR = trial.suggest_float("discount_factor", 0.980, 0.999)
-    TrainingSettings().ACTOR_LEARNING_RATE = trial.suggest_float("actor_lr", 1e-5, 1e-2, log=True)
-    TrainingSettings().CRITIC_LEARNING_RATE = trial.suggest_float("critic_lr", 1e-5, 1e-2, log=True)
-    TrainingSettings().ALPHA_LEARNING_RATE = trial.suggest_float("alpha_lr", 1e-5, 1e-2, log=True)
+    TrainingSettings().DISCOUNT_FACTOR = trial.suggest_float("discount_factor", 0.990, 0.999)
+    TrainingSettings().ACTOR_LEARNING_RATE = trial.suggest_float("actor_lr", 1e-4, 1e-2, log=True)
+    TrainingSettings().CRITIC_LEARNING_RATE = trial.suggest_float("critic_lr", 1.5e-4, 1.5e-2, log=True)
+    TrainingSettings().ALPHA_LEARNING_RATE = trial.suggest_float("alpha_lr", 3e-5, 3e-3, log=True)
     TrainingSettings().HIDDEN_ACTOR_NODES = trial.suggest_categorical("hidden_actor_nodes", [64, 128, 256])
     TrainingSettings().HIDDEN_CRITIC_NODES = trial.suggest_categorical("hidden_critic_nodes", [64, 128, 256])
-    TrainingSettings().TAU = trial.suggest_float("tau", 1e-3, 2e-2, log=True)
-    TrainingSettings().INIT_ALPHA = trial.suggest_float("init_alpha", 0.05, 0.50, log=True)
+    TrainingSettings().TAU = trial.suggest_float("tau", 5e-4, 5e-2, log=True)
+    TrainingSettings().INIT_ALPHA = trial.suggest_float("init_alpha", 0.1, 0.40, log=True)
     TrainingSettings().BATCH_SIZE = trial.suggest_categorical("batch_size", [64, 128, 256, 512])
-    TrainingSettings().BUFFER_SIZE = trial.suggest_categorical("buffer_size", [50_000, 100_000, 200_000, 500_000])
-    TrainingSettings().ENERGY_COEFF = trial.suggest_float("energy_coeff", 0.0, 1.0)
-    TrainingSettings().WARMUP_STEPS = trial.suggest_categorical("warmup_steps", [2_000, 5_000, 10_000, 20_000])
+    TrainingSettings().BUFFER_SIZE = trial.suggest_categorical("buffer_size", [50_000, 100_000, 200_000])
+    TrainingSettings().ENERGY_COEFF = trial.suggest_float("energy_coeff", 0.1, 1.0)
+    warmup_suggestion = trial.suggest_categorical("warmup_steps", [10_000, 30_000, 50_000, 70_000])
+    TrainingSettings().WARMUP_STEPS = min(warmup_suggestion, TrainingSettings().BUFFER_SIZE)
 
     # ── Environment hyperparameters ───────────────────────────────────────────
     RenderingSettings().ICE_FRICTION = trial.suggest_float("ice_friction", 0.01, 0.10, log=True)
@@ -64,8 +65,8 @@ def objective(trial: optuna.Trial) -> float:
         replay_buffer = ReplayBuffer(TrainingSettings().BUFFER_SIZE)
 
         # ── Warmup ────────────────────────────────────────────────────────────
-        with tqdm.tqdm(total=TrainingSettings().WARMUP_STEPS, desc=f"Trial {trial.number} | Warmup",
-                       leave=False) as pbar:
+        with tqdm.tqdm(total=TrainingSettings().WARMUP_STEPS, desc=f"Trial {trial.number} | Warmup", position=0,
+                       leave=True) as pbar:
             while len(replay_buffer) < TrainingSettings().WARMUP_STEPS:
                 state, done = env.reset(), False
                 while not done:
@@ -78,7 +79,7 @@ def objective(trial: optuna.Trial) -> float:
         # ── Training ──────────────────────────────────────────────────────────
         episode_returns: list[float] = []
 
-        for episode in tqdm.tqdm(range(OPTUNA_EPISODES), desc=f"Trial {trial.number} | Train", leave=False):
+        for episode in tqdm.tqdm(range(OPTUNA_EPISODES), desc=f"Trial {trial.number} | Train", position=0, leave=True):
             episode_return, done = 0.0, False
             state = env.reset()
 
@@ -106,7 +107,7 @@ def objective(trial: optuna.Trial) -> float:
 
 def run_optimization() -> optuna.Study:
     study_name = "robots-on-ice-hpo"
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     study_dir = Path("optimization_results") / f"{study_name}_{timestamp}"
     study_dir.mkdir(parents=True, exist_ok=True)
     db_path = study_dir / "study.db"
@@ -124,12 +125,13 @@ def run_optimization() -> optuna.Study:
 
     # ── Print results ─────────────────────────────────────────────────────────
     best = study.best_trial
-    print("\n=== Optuna Best Trial ===")
-    print(f"  Trial  : {best.number}")
-    print(f"  Return : {best.value:.4f}")
-    print("  Params :")
+    tqdm.tqdm.write("")
+    tqdm.tqdm.write("=== Optuna Best Trial ===")
+    tqdm.tqdm.write(f"  Trial  : {best.number}")
+    tqdm.tqdm.write(f"  Return : {best.value:.4f}")
+    tqdm.tqdm.write("  Params :")
     for key, value in best.params.items():
-        print(f"    {key:<30s} = {value}")
+        tqdm.tqdm.write(f"    {key:<30s} = {value}")
 
     # ── Persist results ───────────────────────────────────────────────────────
     best_trial_path = study_dir / "best_trial.json"
@@ -146,8 +148,9 @@ def run_optimization() -> optuna.Study:
             indent=2,
         )
 
-    print(f"\nBest parameters saved to {best_trial_path}")
-    print(f"Study database saved to {db_path}")
+    tqdm.tqdm.write("")
+    tqdm.tqdm.write(f"Best parameters saved to {best_trial_path}")
+    tqdm.tqdm.write(f"Study database saved to {db_path}")
     return study
 
 

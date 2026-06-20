@@ -8,14 +8,13 @@ class Singleton(type):
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+        class_name = cls.__name__
+        if class_name not in cls._instances:
+            cls._instances[class_name] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[class_name]
 
-    @classmethod
-    def clear_instance(cls):
-        """Clear all singleton instances."""
-        cls._instances.pop(cls)
+    def clear_instance(self):
+        self._instances.pop(self.__name__, None)
 
 
 class SingletonABCMeta(ABCMeta, Singleton):
@@ -79,3 +78,9 @@ class RenderingSettings(Settings):
     ENABLE_METEORITE = False
     METEORITE_WIDTH = 200
     MAX_METEORITE_SPEED = 2  # m/s
+
+
+if __name__ == "__main__":
+    # Create singleton
+    RenderingSettings()
+    RenderingSettings.clear_instance()
