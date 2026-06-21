@@ -97,7 +97,7 @@ def main(name):
             )
 
 
-def train(seed, c=None, robot_mass=None, experiment_id=1):
+def train(seed, c=None, robot_mass=None, collect_reward=None, experiment_id=1):
     TrainingSettings.clear_instance()
     RenderingSettings.clear_instance()
     TrainingSettings().SEED = seed
@@ -108,6 +108,9 @@ def train(seed, c=None, robot_mass=None, experiment_id=1):
     if robot_mass is not None:
         RenderingSettings().ROBOT_MASS = robot_mass
         name.append(f"M={robot_mass}")
+    if collect_reward is not None:
+        TrainingSettings().REWARD_COEFF = collect_reward
+        name.append(f"R={collect_reward}")
     TrainingSettings().TRAINING_ID = experiment_id
     try:
         main(name=" | ".join(name))
@@ -120,10 +123,13 @@ if __name__ == "__main__":
     # 0.6h per run
     # 14:30 to 23:00 is 8.5h -> 14 runs
     # Until tomorrow at 10
-    # 7.2h for 12 runs
+    # 10.8h for 18 runs
 
     for seed in (47, 48, 49, 50, 51):
         train(seed)
+
+        for r in (0, 20e3, 40e3, 60e3, 80e3, 100e3):  # 6
+            train(seed, collect_reward=r)
 
         for c in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):  # 6
             train(seed, c=c)
