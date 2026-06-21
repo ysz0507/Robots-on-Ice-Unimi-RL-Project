@@ -79,10 +79,10 @@ def main(name):
             if is_recording:
                 env.draw(screen)
         if is_recording:
-            video = wandb.Video(env.get_frames((0, 3, 2, 1)), format="mp4", fps=RenderingSettings().FPS)
+            path = recording_env.save_recording()
+            video = wandb.Video(path, fps=RenderingSettings().FPS)
             wandb.log({"episode": episode, "video": video, "eval/return": episode_return,
                        "eval/targets_collected": env.targets_collected}, step=episode)
-            del video
 
         if episode % TrainingSettings().LOG_FREQ == 0:
             wandb.log(
