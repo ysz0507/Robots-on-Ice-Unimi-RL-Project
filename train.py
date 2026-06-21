@@ -109,7 +109,7 @@ def train(label, seed=47, c=None, robot_mass=None, collect_reward=None, ):
         RenderingSettings().ROBOT_MASS = robot_mass
         name.append(f"M={robot_mass}")
     if collect_reward is not None:
-        TrainingSettings().REWARD_COEFF = collect_reward
+        TrainingSettings().COLLECTED_REWARD = collect_reward
         name.append(f"R={collect_reward}")
     TrainingSettings().TRAINING_ID = label
     try:
