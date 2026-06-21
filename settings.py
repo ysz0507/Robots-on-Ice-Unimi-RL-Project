@@ -30,35 +30,35 @@ class Settings(metaclass=SingletonABCMeta):
 @dataclass(frozen=False)
 class TrainingSettings(Settings):
     WARMUP_STEPS = 50_000
-    BUFFER_SIZE = 100_000
-    BATCH_SIZE = 256
+    BUFFER_SIZE = 200_000
+    BATCH_SIZE = 1024
     SEED = 47
 
     LOG_FREQ = 10
-    VIDEO_FREQ = 50
+    VIDEO_FREQ = 25
 
-    EPISODES = 1_000
-    ENERGY_COEFF = 0.7  # 0-1
+    EPISODES = 400
+    ENERGY_COEFF = 0.9729714646106935  # 0-1
     COLLECTED_REWARD = 1e6
     METEORITE_REWARD = 0  # -1e6
 
-    DISCOUNT_FACTOR = 0.995
-    ACTOR_LEARNING_RATE = 1e-3  # Smaller than critic
-    CRITIC_LEARNING_RATE = 1.5e-3
-    ALPHA_LEARNING_RATE = 3e-4
+    DISCOUNT_FACTOR = 0.9746667947051576
+    ACTOR_LEARNING_RATE = 0.0005119333593712603  # Smaller than critic
+    CRITIC_LEARNING_RATE = 0.005682048734624498
+    ALPHA_LEARNING_RATE = 0.0005497678324141152
 
-    HIDDEN_ACTOR_NODES = 128
-    HIDDEN_CRITIC_NODES = 128
+    HIDDEN_ACTOR_NODES = 265
+    HIDDEN_CRITIC_NODES = 265
 
-    TAU = 0.005
-    INIT_ALPHA = 0.2
+    TAU = 0.040688995907630504
+    INIT_ALPHA = 0.36452787081040844
     TARGET_ENTROPY = -2  # -action_dim for automatic entropy tuning
     TRAINING_ID = int(time.time())
 
 
 @dataclass(frozen=False)
 class RenderingSettings(Settings):
-    ICE_FRICTION = 0.1  # Between 0.1 and 0.01 for the assignment
+    ICE_FRICTION = 0.02028359393854171  # Between 0.1 and 0.01 for the assignment
     WIDTH = 16 * 100  # 16m
     HEIGHT = 12 * 100  # 12m
 
@@ -70,7 +70,7 @@ class RenderingSettings(Settings):
     COLLECT_DISTANCE = 60
 
     MAX_FORCE = 100  # Newtons should be 100 for the assignment
-    ROBOT_MASS = 75  # kg, 50-100
+    ROBOT_MASS = 52  # kg, 50-100
 
     MAX_STEPS_PER_TARGET = int(20 / DT)
     MAX_STEPS_PER_EPISODE = int(60 / DT)

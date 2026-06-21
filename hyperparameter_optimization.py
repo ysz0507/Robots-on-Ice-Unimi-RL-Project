@@ -29,19 +29,20 @@ def objective(trial: optuna.Trial) -> float:
     RenderingSettings.clear_instance()
 
     # ── Training hyperparameters ──────────────────────────────────────────────
-    TrainingSettings().DISCOUNT_FACTOR = trial.suggest_float("discount_factor", 0.990, 0.999)
-    TrainingSettings().ACTOR_LEARNING_RATE = trial.suggest_float("actor_lr", 1e-4, 1e-2, log=True)
-    TrainingSettings().CRITIC_LEARNING_RATE = trial.suggest_float("critic_lr", 1.5e-4, 1.5e-2, log=True)
-    TrainingSettings().ALPHA_LEARNING_RATE = trial.suggest_float("alpha_lr", 3e-5, 3e-3, log=True)
-    TrainingSettings().HIDDEN_ACTOR_NODES = trial.suggest_categorical("hidden_actor_nodes", [64, 128, 256])
-    TrainingSettings().HIDDEN_CRITIC_NODES = trial.suggest_categorical("hidden_critic_nodes", [64, 128, 256])
-    TrainingSettings().TAU = trial.suggest_float("tau", 5e-4, 5e-2, log=True)
-    TrainingSettings().INIT_ALPHA = trial.suggest_float("init_alpha", 0.1, 0.40, log=True)
-    TrainingSettings().BATCH_SIZE = trial.suggest_categorical("batch_size", [64, 128, 256, 512])
-    TrainingSettings().BUFFER_SIZE = trial.suggest_categorical("buffer_size", [50_000, 100_000, 200_000])
-    TrainingSettings().ENERGY_COEFF = trial.suggest_float("energy_coeff", 0.1, 1.0)
-    warmup_suggestion = trial.suggest_categorical("warmup_steps", [10_000, 30_000, 50_000, 70_000])
-    TrainingSettings().WARMUP_STEPS = min(warmup_suggestion, TrainingSettings().BUFFER_SIZE)
+    TrainingSettings().DISCOUNT_FACTOR = trial.suggest_float("discount_factor", 0.950, 0.995)  # 0.990
+    TrainingSettings().ACTOR_LEARNING_RATE = trial.suggest_float("actor_lr", 2e-4, 1.2e-3, log=True)  # 0.00073
+    TrainingSettings().CRITIC_LEARNING_RATE = trial.suggest_float("critic_lr", 1e-3, 8e-3,
+                                                                  log=True)  # 0.00404098770412336
+    TrainingSettings().ALPHA_LEARNING_RATE = trial.suggest_float("alpha_lr", 1e-4, 6e-4, log=True)  # 0.0003613676520
+    # TrainingSettings().HIDDEN_ACTOR_NODES = trial.suggest_categorical("hidden_actor_nodes", [64, 128, 256])
+    # TrainingSettings().HIDDEN_CRITIC_NODES = trial.suggest_categorical("hidden_critic_nodes", [64, 128, 256])
+    TrainingSettings().TAU = trial.suggest_float("tau", 1e-2, 6e-2, log=True)  # 0.036378913915
+    TrainingSettings().INIT_ALPHA = trial.suggest_float("init_alpha", 0.1, 0.40, log=True)  # 0.222660
+    TrainingSettings().BATCH_SIZE = trial.suggest_categorical("batch_size", [256, 512, 1024, 2048])  # 512
+    # TrainingSettings().BUFFER_SIZE = trial.suggest_categorical("buffer_size", [50_000, 100_000, 200_000])
+    TrainingSettings().ENERGY_COEFF = trial.suggest_float("energy_coeff", 0.1, 1.0)  # 0.32
+    # warmup_suggestion = trial.suggest_categorical("warmup_steps", [10_000, 30_000, 50_000, 70_000])
+    # TrainingSettings().WARMUP_STEPS = min(warmup_suggestion, TrainingSettings().BUFFER_SIZE)
 
     # ── Environment hyperparameters ───────────────────────────────────────────
     RenderingSettings().ICE_FRICTION = trial.suggest_float("ice_friction", 0.01, 0.10, log=True)
