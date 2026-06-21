@@ -16,7 +16,8 @@ from settings import TrainingSettings, RenderingSettings
 
 os.environ["WANDB_SILENT"] = "true"
 
-def main():
+
+def main(name):
     random.seed(TrainingSettings().SEED)
     np.random.seed(TrainingSettings().SEED)
     torch.manual_seed(TrainingSettings().SEED)
@@ -27,7 +28,7 @@ def main():
             "TrainingSettings": TrainingSettings().as_dict(),
             "RenderingSettings": RenderingSettings().as_dict(),
         },
-        name=f"SAC Agent Training {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        name=f"{name}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
     )
     wandb.define_metric("*", step_metric="episode")
 
@@ -81,6 +82,7 @@ def main():
             video = wandb.Video(env.get_frames((0, 3, 2, 1)), format="mp4", fps=RenderingSettings().FPS)
             wandb.log({"episode": episode, "video": video, "eval/return": episode_return,
                        "eval/targets_collected": env.targets_collected}, step=episode)
+            del video
 
         if episode % TrainingSettings().LOG_FREQ == 0:
             wandb.log(
@@ -95,31 +97,39 @@ def main():
             )
 
 
-def train():
+def train(seed, c=None, robot_mass=None, experiment_id=1):
+    TrainingSettings.clear_instance()
+    RenderingSettings.clear_instance()
+    TrainingSettings().SEED = seed
+    name = [f"Experiment {experiment_id}"]
+    if c is not None:
+        TrainingSettings().ENERGY_COEFF = c
+        name.append(f"C={c}")
+    if robot_mass is not None:
+        RenderingSettings().ROBOT_MASS = robot_mass
+        name.append(f"M={robot_mass}")
+    TrainingSettings().TRAINING_ID = experiment_id
     try:
-        main()
+        main(name=" | ".join(name))
     finally:
         wandb.finish()
         pygame.quit()
 
 
-def train_with_seeds():
-    for seed in (42, 43, 44):
-        TrainingSettings().SEED = seed
-        train()
-    TrainingSettings.clear_instance()
-    RenderingSettings.clear_instance()
-
-
 if __name__ == "__main__":
-    train()
-    # for c in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):
-    #     TrainingSettings().ENERGY_COEFF = c
-    #     train()
-    #
-    # for weight in (50, 60, 70, 80, 90, 100):
-    #     RenderingSettings().ROBOT_MASS = weight
-    #     train()
+    # 0.6h per run
+    # 14:30 to 23:00 is 8.5h -> 14 runs
+    # Until tomorrow at 10
+    # 7.2h for 12 runs
+
+    for seed in (47, 48, 49, 50, 51):
+        train(seed)
+
+        for c in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):  # 6
+            train(seed, c=c)
+
+        for weight in (50, 60, 70, 80, 90, 100):  # 6
+            train(seed, robot_mass=weight)
 
     # Shutdown
     # subprocess.run(["shutdown", "now"])
