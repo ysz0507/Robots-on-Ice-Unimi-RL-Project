@@ -97,11 +97,11 @@ def main(name):
             )
 
 
-def train(seed, c=None, robot_mass=None, collect_reward=None, experiment_id=1):
+def train(label, seed=47, c=None, robot_mass=None, collect_reward=None, ):
     TrainingSettings.clear_instance()
     RenderingSettings.clear_instance()
     TrainingSettings().SEED = seed
-    name = [f"Experiment {experiment_id}"]
+    name = [label]
     if c is not None:
         TrainingSettings().ENERGY_COEFF = c
         name.append(f"C={c}")
@@ -111,7 +111,7 @@ def train(seed, c=None, robot_mass=None, collect_reward=None, experiment_id=1):
     if collect_reward is not None:
         TrainingSettings().REWARD_COEFF = collect_reward
         name.append(f"R={collect_reward}")
-    TrainingSettings().TRAINING_ID = experiment_id
+    TrainingSettings().TRAINING_ID = label
     try:
         main(name=" | ".join(name))
     finally:
@@ -125,17 +125,14 @@ if __name__ == "__main__":
     # Until tomorrow at 10
     # 10.8h for 18 runs
 
-    for seed in (47, 48, 49, 50, 51):
-        train(seed)
+    train("Default")
 
-        for r in (0, 20e3, 40e3, 60e3, 80e3, 100e3):  # 6
-            train(seed, collect_reward=r)
+    for r in (0, 20e3, 40e3, 60e3, 80e3, 100e3):  # 6
+        train("Collection Reward", collect_reward=r)
 
-        for c in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0):  # 6
-            train(seed, c=c)
-
-        for weight in (50, 60, 70, 80, 90, 100):  # 6
-            train(seed, robot_mass=weight)
+    for weight in (50, 62.5, 75, 87.5, 100):  # 5
+        for c in (0, 0.25, 5, 0.75, 1):  # 5
+            train("Mass vs Energy", c=c, robot_mass=weight)
 
     # Shutdown
     # subprocess.run(["shutdown", "now"])
