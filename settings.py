@@ -22,9 +22,8 @@ class SingletonABCMeta(ABCMeta, Singleton):
 
 
 class Settings(metaclass=SingletonABCMeta):
-    @classmethod
-    def as_dict(cls) -> dict[str, Any]:
-        return {k: v for k, v in cls.__dict__.items() if not k.startswith("_")}
+    def as_dict(self) -> dict[str, Any]:
+        return {k: getattr(self, k) for k in self.__class__.__dict__.keys() if not k.startswith("_")}
 
 
 @dataclass(frozen=False)
