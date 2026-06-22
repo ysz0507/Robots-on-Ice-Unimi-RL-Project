@@ -120,10 +120,6 @@ def train(label, seed=47, c=None, robot_mass=None, collect_reward=None, ):
 
 
 if __name__ == "__main__":
-    # 0.6h per run
-    # 14:30 to 23:00 is 8.5h -> 14 runs
-    # Until tomorrow at 10
-    # 10.8h for 18 runs
     for seed in (48, 49, 50, 51):
         train("Default", seed=seed)
 
@@ -131,7 +127,7 @@ if __name__ == "__main__":
             train("Collection Reward", collect_reward=r, seed=seed)
 
         for weight in (50, 62.5, 75, 87.5, 100):  # 5
-            for c in (0, 0.25, 5, 0.75, 1):  # 5
+            for c in (0, 0.25, 0.5, 0.75, 1):  # 5
                 train("Mass vs Energy", c=c, robot_mass=weight, seed=seed)
 
     # Shutdown
