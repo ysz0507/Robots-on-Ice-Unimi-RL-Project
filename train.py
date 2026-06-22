@@ -124,15 +124,15 @@ if __name__ == "__main__":
     # 14:30 to 23:00 is 8.5h -> 14 runs
     # Until tomorrow at 10
     # 10.8h for 18 runs
+    for seed in (48, 49, 50, 51):
+        train("Default", seed=seed)
 
-    train("Default")
+        for r in (0, 20e3, 40e3, 60e3, 80e3, 100e3):  # 6
+            train("Collection Reward", collect_reward=r, seed=seed)
 
-    for r in (0, 20e3, 40e3, 60e3, 80e3, 100e3):  # 6
-        train("Collection Reward", collect_reward=r)
-
-    for weight in (50, 62.5, 75, 87.5, 100):  # 5
-        for c in (0, 0.25, 5, 0.75, 1):  # 5
-            train("Mass vs Energy", c=c, robot_mass=weight)
+        for weight in (50, 62.5, 75, 87.5, 100):  # 5
+            for c in (0, 0.25, 5, 0.75, 1):  # 5
+                train("Mass vs Energy", c=c, robot_mass=weight, seed=seed)
 
     # Shutdown
     # subprocess.run(["shutdown", "now"])
