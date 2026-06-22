@@ -1,5 +1,9 @@
 # Project 7: Robots on Ice (Project ID: PG-1)
 
+## Examples of the Environment
+
+There are two example videos uploaded in the project root.
+
 ## Main Focus
 
 - Continuous control
