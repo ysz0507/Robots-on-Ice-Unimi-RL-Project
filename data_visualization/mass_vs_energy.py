@@ -3,6 +3,9 @@ from pathlib import Path
 
 import plotly.graph_objects as go
 import wandb
+from tqdm import tqdm
+
+from settings import TrainingSettings
 
 
 def fetch_mass_vs_energy_data(
@@ -16,7 +19,7 @@ def fetch_mass_vs_energy_data(
     # (mass, energy_coeff) -> list of full metric histories, one list per run
     data: dict[tuple, list[list[float]]] = defaultdict(list)
 
-    for run in runs:
+    for run in tqdm(runs):
         if run.state != "finished":
             continue
 
@@ -105,7 +108,7 @@ def main(metric_name="train/return", legend="Return") -> None:
     experiment_label = "Mass vs Energy"
     last_n_returns = 5
     output_path = Path(__file__).resolve().parent / "out" / legend.lower().replace(" ", "_")
-    checkpoints = [100, 200, 300, 400]
+    checkpoints = [10, 20, 30, 40]
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -115,14 +118,15 @@ def main(metric_name="train/return", legend="Return") -> None:
         metric_name=metric_name,
     )
 
+    log_freq = TrainingSettings().LOG_FREQ
     for checkpoint in checkpoints:
         window_data = aggregate_window_data(data, checkpoint, last_n_returns)
         fig = create_heatmap(
             window_data,
-            title=f"Mass vs Energy Heatmap (episodes {checkpoint - last_n_returns} to {checkpoint})",
+            title=f"Mass vs Energy Heatmap (episodes {(checkpoint - last_n_returns) * log_freq} to {checkpoint * log_freq})",
             legend=legend,
         )
-        fig.write_html(output_path.with_name(f"{output_path.name}_{checkpoint}").with_suffix(".html"))
+        # fig.write_html(output_path.with_name(f"{output_path.name}_{checkpoint}").with_suffix(".html"))
         fig.write_image(output_path.with_name(f"{output_path.name}_{checkpoint}").with_suffix(".png"))
 
 
