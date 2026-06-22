@@ -1,8 +1,19 @@
 # Project 7: Robots on Ice (Project ID: PG-1)
 
-## Examples of the Environment
+## The environment
 
-There are two example videos uploaded in the project root.
+I provide example videos of the environment in the project root.
+
+## Results
+
+I provide results in the `data_visualization` folder. The results include:
+
+- Learning curves for different target-collected-reward
+- Experiments showing the effect of different mass values and cost coefficients on the training
+
+Further I uploaded my hyperparameter optimization results in the `optimization_results` folder.
+
+# Assignment Description
 
 ## Main Focus
 
